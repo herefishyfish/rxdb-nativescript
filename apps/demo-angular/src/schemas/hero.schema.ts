@@ -4,7 +4,6 @@ export const HERO_SCHEMA_LITERAL = {
   title: 'hero schema',
   description: 'describes a simple hero',
   version: 0,
-  keyCompression: false,
   primaryKey: 'id',
   type: 'object',
   properties: {
@@ -29,6 +28,7 @@ export const HERO_SCHEMA_LITERAL = {
       maxLength: 24,
     },
   },
+  indexes: ['name', 'color', 'updatedAt', 'createdAt'],
   required: ['id', 'name'],
 } as const;
 

@@ -123,9 +123,9 @@ function syncHasuraGraphQL<RxDocType, CheckpointType>(
         if (result.errors) {
           throw result.errors;
         }
-        const dataPath = Object.keys(result.data)[0];
-        const data: any = objectPath.get(result.data, dataPath);
-        return data;
+
+        // Normally returns list of conflicts, we're not doing any checks so ignore it.
+        return [];
       },
       batchSize: push.batchSize,
       modifier: push.modifier,
