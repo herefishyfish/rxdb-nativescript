@@ -6,6 +6,7 @@
     "nativescript-md5": "packages/nativescript-md5",
     "rxdb": "packages/rxdb",
     "nativescript-sqlite-rxstorage-adapter": "packages/nativescript-sqlite-rxstorage-adapter",
-    "nativescript-pouchdb-sqlite-adapter": "packages/nativescript-pouchdb-sqlite-adapter"
+    "nativescript-pouchdb-sqlite-adapter": "packages/nativescript-pouchdb-sqlite-adapter",
+    "nativescript-lokijs-rxstorage": "packages/nativescript-lokijs-rxstorage"
   }
 }
