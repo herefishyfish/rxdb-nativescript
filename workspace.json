@@ -2,6 +2,10 @@
   "version": 2,
   "projects": {
     "demo": "apps/demo",
-    "demo-angular": "apps/demo-angular"
+    "demo-angular": "apps/demo-angular",
+    "nativescript-md5": "packages/nativescript-md5",
+    "rxdb": "packages/rxdb",
+    "nativescript-sqlite-rxstorage-adapter": "packages/nativescript-sqlite-rxstorage-adapter",
+    "nativescript-pouchdb-sqlite-adapter": "packages/nativescript-pouchdb-sqlite-adapter"
   }
 }

@@ -1,0 +1,10 @@
+<ActionBar title="nativescript-memory" class="action-bar"> </ActionBar>
+<StackLayout class="p-20">
+  <ScrollView class="h-full">
+    <StackLayout>
+      <Label *ngFor="let hero of _rxdb.heros$ | async" [text]="hero.name" textWrap="true"></Label>
+
+      <Button text="Test nativescript-pouchdb-sqlite" (tap)="_rxdb.addHero()" class="btn btn-primary"></Button>
+    </StackLayout>
+  </ScrollView>
+</StackLayout>

@@ -1,0 +1,35 @@
+{
+  "name": "@herefishyfish/nativescript-md5",
+  "version": "1.0.0",
+  "description": "Add a plugin description",
+  "main": "index",
+  "typings": "index.d.ts",
+  "nativescript": {
+    "platforms": {
+      "ios": "6.0.0",
+      "android": "6.0.0"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/herefishyfish/rxdb-nativescript.git"
+  },
+  "keywords": [
+    "NativeScript",
+    "JavaScript",
+    "TypeScript",
+    "iOS",
+    "Android"
+  ],
+  "author": {
+    "name": "Dylan Llewellyn",
+    "email": "dylan@herefushy.dev"
+  },
+  "bugs": {
+    "url": "https://github.com/herefishyfish/rxdb-nativescript/issues"
+  },
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/herefishyfish/rxdb-nativescript",
+  "readmeFilename": "README.md",
+  "bootstrapper": "@nativescript/plugin-seed"
+}

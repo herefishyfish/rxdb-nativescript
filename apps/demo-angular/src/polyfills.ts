@@ -1,15 +1,17 @@
 /**
-* NativeScript Polyfills
-*/
+ * NativeScript Polyfills
+ */
 
 // Install @nativescript/core polyfills (XHR, setTimeout, requestAnimationFrame)
 import '@nativescript/core/globals';
+// WebSockets polyfills
+import '@valor/nativescript-websockets';
 // Install @nativescript/angular specific polyfills
 import '@nativescript/angular/polyfills';
 
 /**
-* Zone.js and patches
-*/
+ * Zone.js and patches
+ */
 // Add pre-zone.js patches needed for the NativeScript platform
 import '@nativescript/zone-js/dist/pre-zone-polyfills';
 
@@ -18,4 +20,3 @@ import 'zone.js';
 
 // Add NativeScript specific Zone JS patches
 import '@nativescript/zone-js';
-       

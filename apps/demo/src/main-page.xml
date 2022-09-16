@@ -6,6 +6,11 @@
     <ScrollView class="h-full">
       <StackLayout>
         <Button text="add a package first" tap="{{ viewDemo }}" class="btn btn-primary view-demo"/>
+
+<Button text="nativescript-md5" tap="{{ viewDemo }}" class="btn btn-primary view-demo"/>
+<Button text="rxdb" tap="{{ viewDemo }}" class="btn btn-primary view-demo"/>
+<Button text="nativescript-sqlite-rxstorage-adapter" tap="{{ viewDemo }}" class="btn btn-primary view-demo"/>
+<Button text="nativescript-pouchdb-sqlite-adapter" tap="{{ viewDemo }}" class="btn btn-primary view-demo"/>
       </StackLayout>
     </ScrollView>
   </StackLayout>

@@ -1,0 +1,16 @@
+{
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/herefishyfish/rxdb-nativescript.git"
+  },
+  "keywords": ["NativeScript", "JavaScript", "TypeScript", "iOS", "Android"],
+  "author": {
+    "name": "Dylan Llewellyn",
+    "email": "dylan@herefishy.dev"
+  },
+  "bugs": {
+    "url": "https://github.com/herefishyfish/rxdb-nativescript/issues"
+  },
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/herefishyfish/rxdb-nativescript"
+}

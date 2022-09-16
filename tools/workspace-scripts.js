@@ -55,12 +55,47 @@ module.exports = {
       },
     },
     '⚙️': {
-      script: `npx cowsay "@nativescript/* packages will keep your ⚙️ cranking"`,
-      description: '_____________  @nativescript/*  _____________',
+      script: `npx cowsay "@rxdb/* packages will keep your ⚙️ cranking"`,
+      description: '_____________  @rxdb/*  _____________',
     },
     // packages
     // build output is always in dist/packages
-    '@nativescript': {
+    '@rxdb': {
+      // nativescript-rxstorage-sqlite-adapter
+      'nativescript-rxstorage-sqlite-adapter': {
+        build: {
+          script: 'nx run nativescript-rxstorage-sqlite-adapter:build.all',
+          description: 'nativescript-rxstorage-sqlite-adapter: Build',
+        },
+      },
+      // @rxdb/nativescript-md5
+      'nativescript-md5': {
+        build: {
+          script: 'nx run nativescript-md5:build.all',
+          description: '@rxdb/nativescript-md5: Build',
+        },
+      },
+      // @@herefishyfish/rxdb
+      rxdb: {
+        build: {
+          script: 'nx run rxdb:build.all',
+          description: '@@herefishyfish/rxdb: Build',
+        },
+      },
+      // @herefishyfish/nativescript-sqlite-rxstorage-adapter
+      'nativescript-sqlite-rxstorage-adapter': {
+        build: {
+          script: 'nx run nativescript-sqlite-rxstorage-adapter:build.all',
+          description: '@herefishyfish/nativescript-sqlite-rxstorage-adapter: Build',
+        },
+      },
+      // @herefishyfish/nativescript-pouchdb-sqlite-adapter
+      'nativescript-pouchdb-sqlite-adapter': {
+        build: {
+          script: 'nx run nativescript-pouchdb-sqlite-adapter:build.all',
+          description: '@herefishyfish/nativescript-pouchdb-sqlite-adapter: Build',
+        },
+      },
       'build-all': {
         script: 'nx run-many --target=build.all --all',
         description: 'Build all packages',
@@ -71,8 +106,28 @@ module.exports = {
       description: '_____________  Focus (VS Code supported)  _____________',
     },
     focus: {
+      'nativescript-rxstorage-sqlite-adapter': {
+        script: 'nx run nativescript-rxstorage-sqlite-adapter:focus',
+        description: 'Focus on nativescript-rxstorage-sqlite-adapter',
+      },
+      'nativescript-md5': {
+        script: 'nx run nativescript-md5:focus',
+        description: 'Focus on @rxdb/nativescript-md5',
+      },
+      rxdb: {
+        script: 'nx run rxdb:focus',
+        description: 'Focus on @@herefishyfish/rxdb',
+      },
+      'nativescript-sqlite-rxstorage-adapter': {
+        script: 'nx run nativescript-sqlite-rxstorage-adapter:focus',
+        description: 'Focus on @herefishyfish/nativescript-sqlite-rxstorage-adapter',
+      },
+      'nativescript-pouchdb-sqlite-adapter': {
+        script: 'nx run nativescript-pouchdb-sqlite-adapter:focus',
+        description: 'Focus on @herefishyfish/nativescript-pouchdb-sqlite-adapter',
+      },
       reset: {
-        script: 'nx g @nativescript/plugin-tools:focus-packages',
+        script: 'nx g @rxdb/plugin-tools:focus-packages',
         description: 'Reset Focus',
       },
     },
