@@ -7,7 +7,7 @@ import { HomeComponent } from './home.component';
 const routes: Routes = [
   { path: '', redirectTo: '/home', pathMatch: 'full' },
   { path: 'home', component: HomeComponent },
-  { path: 'lokijs-rxstorage', loadChildren: () => import('./plugin-demos/nativescript-lokijs-rxstorage.module').then((m) => m.NativescriptLokijsRxstorageModule) },
+  { path: 'lokijs-rxstorage', loadChildren: () => import('./plugin-demos/rxstorage-lokijs/lokijs-rxstorage.module').then((m) => m.NativescriptLokijsRxstorageModule) },
   { path: 'nativescript-md5', loadChildren: () => import('./plugin-demos/nativescript-md5.module').then((m) => m.NativescriptMd5Module) },
   { path: 'rxstorage-memory', loadChildren: () => import('./plugin-demos/rxstorage-memory/rxstorage-memory.module').then((m) => m.NativeScriptRxStorageMemoryModule) },
   // { path: 'pouchdb-sqlite', loadChildren: () => import('./plugin-demos/pouchdb-sqlite/pouchdb-sqlite.module').then(m => m.NativeScriptPouchDBSqliteModule) },

@@ -1,11 +1,10 @@
 import { Component, NgZone } from '@angular/core';
-import { RxDBService } from './nativescript-rxdb.service';
-
+import { RxDBCoreService } from '../../replicator/rxdb-service';
 @Component({
   selector: 'demo-nativescript-pouchdb-sqlite',
   templateUrl: 'pouchdb-sqlite.component.html',
-  providers: [RxDBService],
+  providers: [RxDBCoreService],
 })
 export class NativeScriptPouchDBSqliteComponent {
-  constructor(private _ngZone: NgZone, public _rxdb: RxDBService) {}
+  constructor(private _ngZone: NgZone, public _rxdb: RxDBCoreService) {}
 }

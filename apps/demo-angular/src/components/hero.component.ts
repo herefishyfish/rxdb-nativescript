@@ -1,11 +1,13 @@
-import { Component, EventEmitter, Input, NO_ERRORS_SCHEMA, Output } from '@angular/core';
+import { Component, inject, Input, NO_ERRORS_SCHEMA } from '@angular/core';
 import { NativeScriptCommonModule } from '@nativescript/angular';
+import { Dialogs } from '@nativescript/core';
+import { RxDBCoreService } from '../replicator/rxdb-service';
 import { RxHeroDocumentType } from '../schemas/hero.schema';
 
 @Component({
   selector: 'app-hero',
   template: `
-    <StackLayout class="hero-card" (tap)="onTap($event)" orientation="horizontal">
+    <StackLayout class="hero-card" (tap)="onTap()" orientation="horizontal">
       <Label text="{{ hero?.name }}'s favorite color is: " textWrap="true"></Label>
       <StackLayout width="20" height="20" [backgroundColor]="hero?.color"></StackLayout>
     </StackLayout>
@@ -29,10 +31,18 @@ import { RxHeroDocumentType } from '../schemas/hero.schema';
 })
 export class HeroComponent {
   @Input() hero!: RxHeroDocumentType;
-  @Output() heroTapped = new EventEmitter();
+  _rxdb = inject(RxDBCoreService);
 
-  onTap(event) {
-    console.log(`${this.hero?.name ?? ''} tapped!`);
-    this.heroTapped.emit(event);
+  onTap() {
+    Dialogs.prompt('Change hero name', this.hero.name).then((promptResult) => {
+      if (promptResult.result == true) {
+        this._rxdb.database.heroes.upsert({
+          id: this.hero.id,
+          color: this.hero.color,
+          name: promptResult.text,
+          updatedAt: new Date().toISOString(),
+        });
+      }
+    });
   }
 }

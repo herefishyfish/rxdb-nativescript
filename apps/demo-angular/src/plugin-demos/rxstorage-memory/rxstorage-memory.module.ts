@@ -7,6 +7,5 @@ import { HeroComponent } from '../../components/hero.component';
   imports: [NativeScriptCommonModule, NativeScriptRouterModule.forChild([{ path: '', component: NativeScriptRxStorageMemoryComponent }]), HeroComponent],
   declarations: [NativeScriptRxStorageMemoryComponent],
   schemas: [NO_ERRORS_SCHEMA],
-  // providers: [RxDBService]
 })
 export class NativeScriptRxStorageMemoryModule {}

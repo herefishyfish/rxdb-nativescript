@@ -1,24 +1,30 @@
-import { Injectable } from '@angular/core';
+import { Inject, Injectable, InjectionToken, OnDestroy } from '@angular/core';
 import { Dialogs, isAndroid } from '@nativescript/core';
-import { addRxPlugin, createRxDatabase } from 'rxdb';
-import { getRxStorageMemory } from 'rxdb/plugins/memory';
+import { addRxPlugin, createRxDatabase, RxDatabase } from 'rxdb';
+import { Subject, takeUntil, tap } from 'rxjs';
 // Using customized replication plugin for Hasura backend
 // import { RxDBReplicationGraphQLPlugin } from "rxdb/plugins/replication-graphql";
-import { RxDBReplicationHasuraGraphQLPlugin } from '../../replicator/graphql-plugin';
+import { RxDBReplicationHasuraGraphQLPlugin } from './graphql-plugin';
 import { RxDBQueryBuilderPlugin } from 'rxdb/plugins/query-builder';
-import { pullQueryBuilder, pushQueryBuilder, pullStreamQueryBuilder } from '../../replicator/query-builder';
-import { HERO_SCHEMA } from '../../schemas/hero.schema';
-import { tap } from 'rxjs';
+import { pullQueryBuilder, pushQueryBuilder, pullStreamQueryBuilder } from './query-builder';
+import { HERO_SCHEMA } from '../schemas/hero.schema';
 
 const batchSize = 100;
 
+export interface RxDBStorage {
+  getRxDBStorage();
+}
+
+export const RXDB_STORAGE = new InjectionToken<RxDBStorage>('RXDB_STORAGE');
+
 @Injectable()
-export class RxDBService {
+export class RxDBCoreService implements OnDestroy {
   heros$;
   replicationState;
-  private database;
+  database: RxDatabase;
+  private destroy$ = new Subject<void>();
 
-  constructor() {
+  constructor(@Inject(RXDB_STORAGE) private rxdbStorage: RxDBStorage) {
     addRxPlugin(RxDBQueryBuilderPlugin);
     addRxPlugin(RxDBReplicationHasuraGraphQLPlugin);
     this.initDb();
@@ -33,12 +39,15 @@ export class RxDBService {
   }
 
   async initDb() {
+    console.log('Creating Database');
     this.database = await createRxDatabase({
       name: 'exampledb',
-      storage: getRxStorageMemory(),
+      storage: this.rxdbStorage as any,
       multiInstance: false,
       ignoreDuplicate: true,
     });
+
+    console.log('Creating Collections');
     await this.database.addCollections({
       heroes: {
         schema: HERO_SCHEMA,
@@ -54,6 +63,7 @@ export class RxDBService {
       },
     });
 
+    console.log('Creating Replication');
     this.replicationState = await this.database.heroes.syncGraphQL({
       url: {
         http: 'https://working-oriole-73.hasura.app/v1/graphql',
@@ -77,7 +87,7 @@ export class RxDBService {
       deletedField: 'deleted',
     });
 
-    this.replicationState.error$.subscribe((err) => {
+    this.replicationState.error$.pipe(takeUntil(this.destroy$)).subscribe((err) => {
       console.dir(err);
     });
 
@@ -105,5 +115,11 @@ export class RxDBService {
         });
       }
     });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+    this.database.destroy();
   }
 }
