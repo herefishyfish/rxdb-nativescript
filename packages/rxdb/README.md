@@ -1,12 +1,12 @@
 # @@herefishyfish/rxdb
 
 ```javascript
-npm i @@herefishyfish/rxdb
+npm i @herefishyfish/rxdb
 ```
 
-## Usage
+Thin wrappers for RxDB compatibility with NativeScript 
 
-// TODO
+
 
 ## License
 
