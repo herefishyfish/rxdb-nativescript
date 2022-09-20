@@ -1,5 +1,7 @@
 import GraphQLClient from 'graphql-client';
-import { SubscriptionClient } from 'subscriptions-transport-ws';
+// import { SubscriptionClient } from 'subscriptions-transport-ws';
+import { Client, createClient } from 'graphql-ws';
+import * as IsomorphicWebSocket from 'isomorphic-ws';
 import * as objectPath from 'object-path';
 import { RxCollection, SyncOptionsGraphQL, RxReplicationPullStreamItem, WithDeleted, RxReplicationWriteToMasterRow, fastUnsecureHash, ensureNotFalsy, RxPlugin, lastOfArray } from 'rxdb';
 import { startReplicationOnLeaderShip } from 'rxdb/dist/lib/plugins/replication';
@@ -23,14 +25,13 @@ import { Subject } from 'rxjs';
  * Standard getGraphQLWebSocket definition doesn't allow adding connection params only the url.
  * Fixes document/checkpoint results.
  */
-function getGraphQLWebSocket(url: string, headers = {}): SubscriptionClient {
+function getGraphQLWebSocket(url: string, headers = {}): Client {
   let has = GRAPHQL_WEBSOCKET_BY_URL.get(url);
   if (!has) {
-    const wsClient = new SubscriptionClient(url, {
-      reconnect: true,
-      connectionParams: {
-        headers,
-      },
+    const wsClient = createClient({
+      url,
+      shouldRetry: () => true,
+      webSocketImpl: IsomorphicWebSocket.WebSocket,
     });
     has = {
       url,
@@ -139,22 +140,25 @@ function syncHasuraGraphQL<RxDocType, CheckpointType>(
   const startBefore = graphqlReplicationState.start.bind(graphqlReplicationState);
   graphqlReplicationState.start = () => {
     if (mustUseSocket) {
-      const wsClient = getGraphQLWebSocket(ensureNotFalsy(url.ws), headers);
-      const clientRequest = wsClient.request(ensureNotFalsy(pull.streamQueryBuilder)(mutateableClientState.headers));
-      console.log(clientRequest);
-      clientRequest.subscribe({
-        next(data: any) {
-          const firstField = Object.keys(data.data)[0];
-          const newCheckpoint: any = getCheckpoint(data.data[firstField]);
+      const wsClient = getGraphQLWebSocket(ensureNotFalsy(url.ws));
 
-          pullStream$.next({ documents: data.data[firstField], checkpoint: newCheckpoint });
+      wsClient.on('connected', () => {
+        pullStream$.next('RESYNC');
+      });
+
+      const query: any = ensureNotFalsy(pull.streamQueryBuilder)(mutateableClientState.headers);
+
+      wsClient.subscribe(query, {
+        next: (data: any) => {
+          const firstField = Object.keys(data.data)[0];
+          pullStream$.next(data.data[firstField]);
         },
-        error(error: any) {
+        error: (error: any) => {
           pullStream$.error(error);
         },
-      });
-      wsClient.onReconnected(() => {
-        pullStream$.next('RESYNC');
+        complete: () => {
+          pullStream$.complete();
+        },
       });
     }
     return startBefore();
