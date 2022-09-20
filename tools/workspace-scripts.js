@@ -96,11 +96,11 @@ module.exports = {
           description: '@herefishyfish/nativescript-pouchdb-sqlite-adapter: Build',
         },
       },
-      // @herefishyfish/nativescript-lokijs-rxstorage
-      'nativescript-lokijs-rxstorage': {
+      // @herefishyfish/nativescript-lokijs
+      'nativescript-lokijs': {
         build: {
-          script: 'nx run nativescript-lokijs-rxstorage:build.all',
-          description: '@herefishyfish/nativescript-lokijs-rxstorage: Build',
+          script: 'nx run nativescript-lokijs:build.all',
+          description: '@herefishyfish/nativescript-lokijs: Build',
         },
       },
       'build-all': {
@@ -133,9 +133,9 @@ module.exports = {
         script: 'nx run nativescript-pouchdb-sqlite-adapter:focus',
         description: 'Focus on @herefishyfish/nativescript-pouchdb-sqlite-adapter',
       },
-      'nativescript-lokijs-rxstorage': {
-        script: 'nx run nativescript-lokijs-rxstorage:focus',
-        description: 'Focus on @herefishyfish/nativescript-lokijs-rxstorage',
+      'nativescript-lokijs': {
+        script: 'nx run nativescript-lokijs:focus',
+        description: 'Focus on @herefishyfish/nativescript-lokijs',
       },
       reset: {
         script: 'nx g @rxdb/plugin-tools:focus-packages',

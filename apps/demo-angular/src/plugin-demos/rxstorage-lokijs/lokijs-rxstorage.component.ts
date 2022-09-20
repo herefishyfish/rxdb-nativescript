@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
 import { getRxStorageLoki } from 'rxdb/plugins/lokijs';
 import { RxDBCoreService, RXDB_STORAGE } from '../../replicator/rxdb-service';
-import { LokiNativescriptAdapter } from '@herefishyfish/nativescript-lokijs-rxstorage';
+import { LokiNativescriptAdapter } from '@herefishyfish/nativescript-lokijs';
 
 @Component({
-  selector: 'demo-nativescript-lokijs-rxstorage',
+  selector: 'demo-nativescript-lokijs',
   templateUrl: 'lokijs-rxstorage.component.html',
   providers: [
     RxDBCoreService,

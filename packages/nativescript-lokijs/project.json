@@ -1,22 +1,22 @@
 {
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "library",
-  "sourceRoot": "packages/nativescript-lokijs-rxstorage",
+  "sourceRoot": "packages/nativescript-lokijs",
   "targets": {
     "build": {
       "executor": "@nrwl/js:tsc",
       "options": {
-        "outputPath": "dist/packages/nativescript-lokijs-rxstorage",
-        "tsConfig": "packages/nativescript-lokijs-rxstorage/tsconfig.json",
-        "packageJson": "packages/nativescript-lokijs-rxstorage/package.json",
-        "main": "packages/nativescript-lokijs-rxstorage/index.d.ts",
+        "outputPath": "dist/packages/nativescript-lokijs",
+        "tsConfig": "packages/nativescript-lokijs/tsconfig.json",
+        "packageJson": "packages/nativescript-lokijs/package.json",
+        "main": "packages/nativescript-lokijs/index.d.ts",
         "assets": [
-          "packages/nativescript-lokijs-rxstorage/*.md",
-          "packages/nativescript-lokijs-rxstorage/index.d.ts",
+          "packages/nativescript-lokijs/*.md",
+          "packages/nativescript-lokijs/index.d.ts",
           "LICENSE",
           {
             "glob": "**/*",
-            "input": "packages/nativescript-lokijs-rxstorage/platforms/",
+            "input": "packages/nativescript-lokijs/platforms/",
             "output": "./platforms/"
           }
         ],
@@ -31,10 +31,10 @@
     "build.all": {
       "executor": "@nrwl/workspace:run-commands",
       "options": {
-        "commands": ["node tools/scripts/build-finish.ts nativescript-lokijs-rxstorage"],
+        "commands": ["node tools/scripts/build-finish.ts nativescript-lokijs"],
         "parallel": false
       },
-      "outputs": ["dist/packages/nativescript-lokijs-rxstorage"],
+      "outputs": ["dist/packages/nativescript-lokijs"],
       "dependsOn": [
         {
           "target": "build.all",
@@ -49,14 +49,14 @@
     "focus": {
       "executor": "@nrwl/workspace:run-commands",
       "options": {
-        "commands": ["nx g @nativescript/plugin-tools:focus-packages nativescript-lokijs-rxstorage"],
+        "commands": ["nx g @nativescript/plugin-tools:focus-packages nativescript-lokijs"],
         "parallel": false
       }
     },
     "lint": {
       "executor": "@nrwl/linter:eslint",
       "options": {
-        "lintFilePatterns": ["packages/nativescript-lokijs-rxstorage/**/*.ts"]
+        "lintFilePatterns": ["packages/nativescript-lokijs/**/*.ts"]
       }
     }
   },

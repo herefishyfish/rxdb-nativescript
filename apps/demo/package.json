@@ -9,7 +9,7 @@
     "@herefishyfish/rxdb": "file:../../packages/rxdb",
     "@herefishyfish/nativescript-sqlite-rxstorage-adapter": "file:../../packages/nativescript-sqlite-rxstorage-adapter",
     "@herefishyfish/nativescript-pouchdb-sqlite-adapter": "file:../../packages/nativescript-pouchdb-sqlite-adapter",
-    "@herefishyfish/nativescript-lokijs-rxstorage": "file:../../packages/nativescript-lokijs-rxstorage"
+    "@herefishyfish/nativescript-lokijs": "file:../../packages/nativescript-lokijs"
   },
   "devDependencies": {
     "@nativescript/android": "~8.2.0",

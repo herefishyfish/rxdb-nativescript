@@ -11,7 +11,7 @@
 <Button text="rxdb" tap="{{ viewDemo }}" class="btn btn-primary view-demo"/>
 <Button text="nativescript-sqlite-rxstorage-adapter" tap="{{ viewDemo }}" class="btn btn-primary view-demo"/>
 <Button text="nativescript-pouchdb-sqlite-adapter" tap="{{ viewDemo }}" class="btn btn-primary view-demo"/>
-<Button text="nativescript-lokijs-rxstorage" tap="{{ viewDemo }}" class="btn btn-primary view-demo"/>
+<Button text="nativescript-lokijs" tap="{{ viewDemo }}" class="btn btn-primary view-demo"/>
       </StackLayout>
     </ScrollView>
   </StackLayout>
