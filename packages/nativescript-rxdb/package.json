@@ -1,6 +1,6 @@
 {
-  "name": "@herefishyfish/rxdb",
-  "version": "1.0.0",
+  "name": "@herefishyfish/nativescript-rxdb",
+  "version": "0.0.1",
   "description": "RxDB compatibility layer for NativeScript",
   "nativescript": {
     "platforms": {

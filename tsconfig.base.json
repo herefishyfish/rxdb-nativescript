@@ -22,12 +22,12 @@
     "paths": {
       "@demo/shared": ["tools/demo/index.ts"],
       "@herefishyfish/*": ["packages/*"],
-      "nativescript-rxstorage-sqlite-adapter": ["packages/nativescript-rxstorage-sqlite-adapter/index.d.ts"],
+      "@herefishyfish/nativescript-lokijs": ["packages/nativescript-lokijs/index.d.ts"],
       "@herefishyfish/nativescript-md5": ["packages/nativescript-md5/index.d.ts"],
-      "@herefishyfish/rxdb": ["packages/rxdb/index.d.ts"],
-      "@herefishyfish/nativescript-sqlite-rxstorage-adapter": ["packages/nativescript-sqlite-rxstorage-adapter/index.d.ts"],
       "@herefishyfish/nativescript-pouchdb-sqlite-adapter": ["packages/nativescript-pouchdb-sqlite-adapter/index.d.ts"],
-      "@herefishyfish/nativescript-lokijs": ["packages/nativescript-lokijs/index.d.ts"]
+      "@herefishyfish/nativescript-rxdb": ["packages/nativescript-rxdb/index.d.ts"],
+      "@herefishyfish/nativescript-sqlite-rxstorage-adapter": ["packages/nativescript-sqlite-rxstorage-adapter/index.d.ts"],
+      "nativescript-rxstorage-sqlite-adapter": ["packages/nativescript-rxstorage-sqlite-adapter/index.d.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

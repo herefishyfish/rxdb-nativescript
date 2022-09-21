@@ -3,10 +3,10 @@
   "projects": {
     "demo": "apps/demo",
     "demo-angular": "apps/demo-angular",
+    "nativescript-lokijs": "packages/nativescript-lokijs",
     "nativescript-md5": "packages/nativescript-md5",
-    "rxdb": "packages/rxdb",
-    "nativescript-sqlite-rxstorage-adapter": "packages/nativescript-sqlite-rxstorage-adapter",
     "nativescript-pouchdb-sqlite-adapter": "packages/nativescript-pouchdb-sqlite-adapter",
-    "nativescript-lokijs": "packages/nativescript-lokijs"
+    "nativescript-rxdb": "packages/nativescript-rxdb",
+    "nativescript-sqlite-rxstorage-adapter": "packages/nativescript-sqlite-rxstorage-adapter"
   }
 }
