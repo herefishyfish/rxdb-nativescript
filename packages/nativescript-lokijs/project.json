@@ -10,16 +10,7 @@
         "tsConfig": "packages/nativescript-lokijs/tsconfig.json",
         "packageJson": "packages/nativescript-lokijs/package.json",
         "main": "packages/nativescript-lokijs/index.d.ts",
-        "assets": [
-          "packages/nativescript-lokijs/*.md",
-          "packages/nativescript-lokijs/index.d.ts",
-          "LICENSE",
-          {
-            "glob": "**/*",
-            "input": "packages/nativescript-lokijs/platforms/",
-            "output": "./platforms/"
-          }
-        ],
+        "assets": ["packages/nativescript-lokijs/*.md", "packages/nativescript-lokijs/index.d.ts", "packages/nativescript-lokijs/nativescript.webpack.js", "LICENSE"],
         "dependsOn": [
           {
             "target": "build.all",
