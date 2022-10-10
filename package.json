@@ -55,6 +55,6 @@
     "nativescript-md5": "^1.0.1",
     "object-path": "^0.11.8",
     "patch-package": "^6.4.7",
-    "rxdb": "13.1.0"
+    "rxdb": "13.4.5"
   }
 }

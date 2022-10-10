@@ -10,6 +10,9 @@ export class HomeComponent {
       name: 'lokijs-rxstorage',
     },
     {
+      name: 'sqlite-rxstorage',
+    },
+    {
       name: 'nativescript-md5',
     },
     {

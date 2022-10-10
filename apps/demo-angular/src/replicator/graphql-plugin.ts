@@ -110,7 +110,7 @@ function syncHasuraGraphQL<RxDocType, CheckpointType>(
         return {
           documents: docsData,
           checkpoint: newCheckpoint,
-        };
+        } as any;
       },
       batchSize: pull.batchSize,
       modifier: pull.modifier,
