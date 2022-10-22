@@ -1,0 +1,64 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "library",
+  "sourceRoot": "packages/requery-sqlite",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/js:tsc",
+      "options": {
+        "outputPath": "dist/packages/requery-sqlite",
+        "tsConfig": "packages/requery-sqlite/tsconfig.json",
+        "packageJson": "packages/requery-sqlite/package.json",
+        "main": "packages/requery-sqlite/sqlite.d.ts",
+        "assets": [
+          "packages/requery-sqlite/*.md",
+          "packages/requery-sqlite/sqlite.d.ts",
+          "LICENSE",
+          {
+            "glob": "**/*",
+            "input": "packages/requery-sqlite/platforms/",
+            "output": "./platforms/"
+          }
+        ],
+        "dependsOn": [
+          {
+            "target": "build.all",
+            "projects": "dependencies"
+          }
+        ]
+      }
+    },
+    "build.all": {
+      "executor": "@nrwl/workspace:run-commands",
+      "options": {
+        "commands": ["node tools/scripts/build-finish.ts requery-sqlite"],
+        "parallel": false
+      },
+      "outputs": ["dist/packages/requery-sqlite"],
+      "dependsOn": [
+        {
+          "target": "build.all",
+          "projects": "dependencies"
+        },
+        {
+          "target": "build",
+          "projects": "self"
+        }
+      ]
+    },
+    "focus": {
+      "executor": "@nrwl/workspace:run-commands",
+      "options": {
+        "commands": ["nx g @nativescript/plugin-tools:focus-packages requery-sqlite"],
+        "parallel": false
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "options": {
+        "lintFilePatterns": ["packages/requery-sqlite/**/*.ts"]
+      }
+    }
+  },
+  "tags": []
+}

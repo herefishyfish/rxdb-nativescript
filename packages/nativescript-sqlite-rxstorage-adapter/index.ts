@@ -1,25 +1,20 @@
-// import { getRxStorageSQLite, SQLiteQueryWithParams } from 'rxdb-premium/plugins/sqlite';
 type SQLiteQueryWithParams = any;
 import { knownFolders, path } from '@nativescript/core';
-import { openOrCreate, SQLiteDatabase } from '@nativescript-community/sqlite';
+import { openOrCreate, SQLiteDatabase } from '@herefishyfish/requery-sqlite';
 import { SQLiteBasics } from 'rxdb-premium/dist/lib/plugins/sqlite';
 
 export const getSQLiteBasicsNativeScript = (): SQLiteBasics<SQLiteDatabase> => {
   return {
     open: async (name: string) => {
-      return openOrCreate(path.join(knownFolders.documents().getFolder('db').path, `${name}.sqlite`), {
+      return await openOrCreate(path.join(knownFolders.documents().getFolder('db').path, `${name}.sqlite`), {
         transformBlobs: true,
       });
     },
-    all: (db: SQLiteDatabase, queryWithParams: SQLiteQueryWithParams) => {
-      if (queryWithParams.query.toUpperCase().startsWith('SELECT')) {
-        return db.select(queryWithParams.query, queryWithParams.params ?? []);
-      } else {
-        return db.execute(queryWithParams.query, queryWithParams.params ?? []) as any;
-      }
+    all: async (db: SQLiteDatabase, queryWithParams: SQLiteQueryWithParams) => {
+      return (await db.select(queryWithParams.query, queryWithParams.params ?? [])) as any;
     },
-    run: (db: SQLiteDatabase, queryWithParams: SQLiteQueryWithParams): Promise<void> => {
-      return db.execute(queryWithParams.query, queryWithParams.params) as Promise<void>;
+    run: async (db: SQLiteDatabase, queryWithParams: SQLiteQueryWithParams) => {
+      await db.select(queryWithParams.query, queryWithParams.params ?? []);
     },
     close: (db: SQLiteDatabase) => {
       return db.close();

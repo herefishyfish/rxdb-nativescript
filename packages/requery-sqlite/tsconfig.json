@@ -1,0 +1,29 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "../../dist/out-tsc",
+    "rootDir": ".",
+    "strict": false,
+    "target": "es2017",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "declaration": true,
+    "removeComments": true,
+    "noLib": false,
+    "emitDecoratorMetadata": false,
+    "experimentalDecorators": true,
+    "lib": ["es6", "dom"],
+    "sourceMap": true,
+    "pretty": true,
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+    "noEmitHelpers": true,
+    "noEmitOnError": false,
+    "noImplicitAny": false,
+    "noImplicitReturns": true,
+    "noImplicitUseStrict": true,
+    "noFallthroughCasesInSwitch": true
+  },
+  "exclude": ["**/*.spec.ts", "**/*.test.ts", "angular", "platforms", "scripts"],
+  "include": ["**/*.ts", "references.d.ts"]
+}

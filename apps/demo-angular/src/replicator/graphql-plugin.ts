@@ -30,6 +30,7 @@ function getGraphQLWebSocket(url: string, headers = {}): Client {
   if (!has) {
     const wsClient = createClient({
       url,
+      retryAttempts: Number.MAX_SAFE_INTEGER,
       shouldRetry: () => true,
       connectionParams: {
         headers,
@@ -48,11 +49,11 @@ function getGraphQLWebSocket(url: string, headers = {}): Client {
   return has.socket;
 }
 
-function getCheckpoint(data: any[]) {
+function getCheckpoint(data: any[], lastCheckpoint) {
   const lastDoc = lastOfArray(data);
   return {
-    id: lastDoc?.['id'] ?? '',
-    updatedAt: lastDoc?.['updatedAt'] ?? new Date(0).toISOString(),
+    id: lastDoc?.['id'] ?? lastCheckpoint?.id ?? '',
+    updatedAt: lastDoc?.['updatedAt'] ?? lastCheckpoint?.updatedAt ?? new Date(0).toISOString(),
   };
 }
 
@@ -105,7 +106,7 @@ function syncHasuraGraphQL<RxDocType, CheckpointType>(
         const data: any = objectPath.get(result, dataPath);
 
         const docsData: WithDeleted<RxDocType>[] = data;
-        const newCheckpoint = getCheckpoint(docsData);
+        const newCheckpoint = getCheckpoint(docsData, lastPulledCheckpoint);
 
         return {
           documents: docsData,
@@ -155,7 +156,7 @@ function syncHasuraGraphQL<RxDocType, CheckpointType>(
         next: (data: any) => {
           const firstField = Object.keys(data.data)[0];
           const docsData = data.data[firstField];
-          const newCheckpoint = getCheckpoint(data.data[firstField]);
+          const newCheckpoint = getCheckpoint(data.data[firstField], {});
           pullStream$.next({ documents: docsData, checkpoint: newCheckpoint } as any);
         },
         error: (error: any) => {

@@ -30,7 +30,7 @@ export const pullQueryBuilder = (checkpoint, limit) => {
   // the first pull does not have a start-document
   const sortByValue = checkpoint ? checkpoint['updatedAt'] : new Date(0).toISOString();
   const query = `query MyQuery {
-    hero(where: {updatedAt: {_gt: "${sortByValue}"}}, order_by: {updatedAt: asc}) {
+    hero(where: {updatedAt: {_gt: "${sortByValue}"}}, order_by: {updatedAt: asc}, limit: ${limit}) {
       color
       createdAt
       deleted

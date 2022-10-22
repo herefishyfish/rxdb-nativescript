@@ -1,9 +1,9 @@
 {
-  "name": "@herefishyfish/nativescript-sqlite-rxstorage-adapter",
-  "version": "1.0.0",
-  "description": "Add a plugin description",
-  "main": "index",
-  "typings": "index.d.ts",
+  "name": "@herefishyfish/requery-sqlite",
+  "version": "3.4.1",
+  "description": "SQLite for Nativescript",
+  "main": "sqlite",
+  "typings": "sqlite.d.ts",
   "nativescript": {
     "platforms": {
       "ios": "6.0.0",
@@ -13,6 +13,13 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/herefishyfish/rxdb-nativescript.git"
+  },
+  "peerDependencies": {
+    "@nano-sql/core": "^2.3.7",
+    "@nativescript-community/typeorm": "0.2.28-1"
+  },
+  "dependencies": {
+    "@nativescript/hook": "~2.0.0"
   },
   "keywords": [
     "NativeScript",
@@ -25,11 +32,8 @@
     "name": "Dylan Llewellyn",
     "email": "dylan@herefishy.dev"
   },
-  "dependencies": {
-    "@herefishyfish/requery-sqlite": "*"
-  },
   "bugs": {
-    "url": "https://github.com/herefishyfish/rxdb-nativescript/issues"
+    "url": "https://github.com/nativescript-community/sqlite/issues"
   },
   "license": "Apache-2.0",
   "homepage": "https://github.com/herefishyfish/rxdb-nativescript",

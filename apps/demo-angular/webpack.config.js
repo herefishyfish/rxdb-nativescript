@@ -8,6 +8,7 @@ module.exports = (env) => {
   webpack.chainWebpack((config, env) => {
     // shared demo code
     config.resolve.alias.set('@demo/shared', resolve(__dirname, '..', '..', 'tools', 'demo'));
+    config.resolve.alias.set('@herefishyfish/requery-sqlite', resolve(__dirname, 'node_modules', '@herefishyfish', 'requery-sqlite'));
   });
 
   return webpack.resolveConfig();

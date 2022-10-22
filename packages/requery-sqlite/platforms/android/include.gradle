@@ -1,0 +1,10 @@
+	allprojects {
+		repositories {
+			maven { url 'https://jitpack.io' }
+		}
+	}
+
+dependencies {
+  implementation 'com.github.requery:sqlite-android:3.39.2'
+  implementation 'androidx.sqlite:sqlite:2.1.0'
+}

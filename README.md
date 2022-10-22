@@ -1,8 +1,9 @@
-- [@herefishyfish/nativescript-lokijs](packages/nativescript-lokijs/README.md)
+- [@herefishyfish/nativescript-lokijs-adapter](packages/nativescript-lokijs/README.md)
 - [@herefishyfish/nativescript-md5](packages/nativescript-md5/README.md)
 - [@herefishyfish/nativescript-pouchdb-sqlite-adapter](packages/nativescript-pouchdb-sqlite-adapter/README.md)
+- [@herefishyfish/nativescript-rxdb](packages/nativescript-rxdb/README.md)
 - [@herefishyfish/nativescript-sqlite-rxstorage-adapter](packages/nativescript-sqlite-rxstorage-adapter/README.md)
-- [@herefishyfish/rxdb](packages/rxdb/README.md)
+- [@herefishyfish/requery-sqlite](packages/requery-sqlite/README.md)
 
 # How to use?
 

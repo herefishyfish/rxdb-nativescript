@@ -27,7 +27,8 @@
       "@herefishyfish/nativescript-pouchdb-sqlite-adapter": ["packages/nativescript-pouchdb-sqlite-adapter/index.d.ts"],
       "@herefishyfish/nativescript-rxdb": ["packages/nativescript-rxdb/index.d.ts"],
       "@herefishyfish/nativescript-sqlite-rxstorage-adapter": ["packages/nativescript-sqlite-rxstorage-adapter/index.d.ts"],
-      "nativescript-rxstorage-sqlite-adapter": ["packages/nativescript-rxstorage-sqlite-adapter/index.d.ts"]
+      "nativescript-rxstorage-sqlite-adapter": ["packages/nativescript-rxstorage-sqlite-adapter/index.d.ts"],
+      "@herefishyfish/requery-sqlite": ["packages/requery-sqlite/index.d.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

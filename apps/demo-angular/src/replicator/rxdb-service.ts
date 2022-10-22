@@ -1,7 +1,7 @@
 import { Inject, Injectable, InjectionToken, OnDestroy } from '@angular/core';
 import { Dialogs, isAndroid } from '@nativescript/core';
 import { addRxPlugin, createRxDatabase, RxDatabase } from 'rxdb';
-import { Subject, takeUntil, tap } from 'rxjs';
+import { distinctUntilChanged, Subject, takeUntil, tap } from 'rxjs';
 // Using customized replication plugin for Hasura backend
 // import { RxDBReplicationGraphQLPlugin } from "rxdb/plugins/replication-graphql";
 import { RxDBReplicationHasuraGraphQLPlugin } from './graphql-plugin';
@@ -9,7 +9,7 @@ import { RxDBQueryBuilderPlugin } from 'rxdb/plugins/query-builder';
 import { pullQueryBuilder, pushQueryBuilder, pullStreamQueryBuilder } from './query-builder';
 import { HERO_SCHEMA } from '../schemas/hero.schema';
 
-const batchSize = 100;
+const batchSize = 10;
 
 export interface RxDBStorage {
   getRxDBStorage();
@@ -87,9 +87,9 @@ export class RxDBCoreService implements OnDestroy {
       deletedField: 'deleted',
     });
 
-    this.replicationState.error$.pipe(takeUntil(this.destroy$)).subscribe((err) => {
-      console.dir(err);
-    });
+    // this.replicationState.error$.pipe(takeUntil(this.destroy$), distinctUntilChanged()).subscribe((err) => {
+    //   console.dir(err);
+    // });
 
     this.heros$ = this.database.heroes
       .find({
