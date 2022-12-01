@@ -70,7 +70,7 @@ export class RxDBCoreService implements OnDestroy {
         ws: 'wss://working-oriole-73.hasura.app/v1/graphql',
       },
       headers: {
-        'x-hasura-admin-secret': '2zWIdFAkt9O9OGnxqXTkPw14xkQC0jVCSWKRf9hB7OAkrlzz1l8idW9w7SfUPkZE',
+        // 'x-hasura-admin-secret': '2zWIdFAkt9O9OGnxqXTkPw14xkQC0jVCSWKRf9hB7OAkrlzz1l8idW9w7SfUPkZE',
       },
       push: {
         batchSize,

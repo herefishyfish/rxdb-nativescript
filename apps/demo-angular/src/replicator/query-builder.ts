@@ -48,13 +48,8 @@ export const pullQueryBuilder = (checkpoint, limit) => {
 
 export const pullStreamQueryBuilder = () => {
   const query = `subscription HeroSubscription {
-    hero {
-      name
-      id
+    hero(limit: 1, order_by: {updatedAt: desc}) {
       updatedAt
-      createdAt
-      deleted
-      color
     }
   }`;
 

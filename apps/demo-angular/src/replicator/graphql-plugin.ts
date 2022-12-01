@@ -1,7 +1,4 @@
-import GraphQLClient from 'graphql-client';
-// import { SubscriptionClient } from 'subscriptions-transport-ws';
 import { Client, createClient } from 'graphql-ws';
-import * as IsomorphicWebSocket from 'isomorphic-ws';
 import * as objectPath from 'object-path';
 import { RxCollection, SyncOptionsGraphQL, RxReplicationPullStreamItem, WithDeleted, RxReplicationWriteToMasterRow, fastUnsecureHash, ensureNotFalsy, RxPlugin, lastOfArray } from 'rxdb';
 import { startReplicationOnLeaderShip } from 'rxdb/dist/lib/plugins/replication';
@@ -35,7 +32,6 @@ function getGraphQLWebSocket(url: string, headers = {}): Client {
       connectionParams: {
         headers,
       },
-      webSocketImpl: IsomorphicWebSocket.WebSocket,
     });
     has = {
       url,
@@ -52,8 +48,8 @@ function getGraphQLWebSocket(url: string, headers = {}): Client {
 function getCheckpoint(data: any[], lastCheckpoint) {
   const lastDoc = lastOfArray(data);
   return {
-    id: lastDoc?.['id'] ?? lastCheckpoint?.id ?? '',
-    updatedAt: lastDoc?.['updatedAt'] ?? lastCheckpoint?.updatedAt ?? new Date(0).toISOString(),
+    id: lastDoc?.id ?? lastCheckpoint?.id ?? '',
+    updatedAt: lastDoc?.updatedAt ?? lastCheckpoint?.updatedAt ?? new Date(0).toISOString(),
   };
 }
 
@@ -78,14 +74,13 @@ function syncHasuraGraphQL<RxDocType, CheckpointType>(
   // eslint-disable-next-line @typescript-eslint/no-this-alias
   const collection = this;
 
+  /**
+   * We use this object to store the GraphQL client
+   * so we can later swap out the client inside of the replication handlers.
+   */
   const mutateableClientState = {
     headers,
     credentials,
-    client: GraphQLClient({
-      url: url.http,
-      headers,
-      credentials,
-    }),
   };
 
   const pullStream$: Subject<RxReplicationPullStreamItem<RxDocType, CheckpointType>> = new Subject();
@@ -96,15 +91,21 @@ function syncHasuraGraphQL<RxDocType, CheckpointType>(
     replicationPrimitivesPull = {
       async handler(lastPulledCheckpoint: CheckpointType) {
         const pullGraphQL = await pull.queryBuilder(lastPulledCheckpoint, pullBatchSize);
-        const result = await mutateableClientState.client.query(pullGraphQL.query, pullGraphQL.variables);
+        const result = await graphqlReplicationState.graphQLRequest(pullGraphQL);
 
         if (result.errors) {
           throw result.errors;
         }
 
         const dataPath = pull.dataPath || ['data', Object.keys(result.data)[0]];
-        const data: any = objectPath.get(result, dataPath);
+        let data: any = objectPath.get(result, dataPath);
 
+        if (pull.responseModifier) {
+          data = await pull.responseModifier(data, 'handler', lastPulledCheckpoint);
+        }
+
+        // const docsData: WithDeleted<RxDocType>[] = data.documents;
+        // const newCheckpoint = data.checkpoint;
         const docsData: WithDeleted<RxDocType>[] = data;
         const newCheckpoint = getCheckpoint(docsData, lastPulledCheckpoint);
 
@@ -123,13 +124,15 @@ function syncHasuraGraphQL<RxDocType, CheckpointType>(
     replicationPrimitivesPush = {
       async handler(rows: RxReplicationWriteToMasterRow<RxDocType>[]) {
         const pushObj = await push.queryBuilder(rows);
-        const result = await mutateableClientState.client.query(pushObj.query, pushObj.variables);
+        const result = await graphqlReplicationState.graphQLRequest(pushObj);
 
         if (result.errors) {
           throw result.errors;
         }
 
-        // Normally returns list of conflicts, we're not doing any checks so ignore it.
+        // const dataPath = Object.keys(result.data)[0];
+        // const data: any = objectPath.get(result.data, dataPath);
+        // return data;
         return [];
       },
       batchSize: push.batchSize,
@@ -144,7 +147,7 @@ function syncHasuraGraphQL<RxDocType, CheckpointType>(
   const startBefore = graphqlReplicationState.start.bind(graphqlReplicationState);
   graphqlReplicationState.start = () => {
     if (mustUseSocket) {
-      const wsClient = getGraphQLWebSocket(ensureNotFalsy(url.ws), headers ?? {});
+      const wsClient = getGraphQLWebSocket(ensureNotFalsy(url.ws), mutateableClientState.headers);
 
       wsClient.on('connected', () => {
         pullStream$.next('RESYNC');
@@ -153,11 +156,18 @@ function syncHasuraGraphQL<RxDocType, CheckpointType>(
       const query: any = ensureNotFalsy(pull.streamQueryBuilder)(mutateableClientState.headers);
 
       wsClient.subscribe(query, {
-        next: (data: any) => {
-          const firstField = Object.keys(data.data)[0];
-          const docsData = data.data[firstField];
-          const newCheckpoint = getCheckpoint(data.data[firstField], {});
-          pullStream$.next({ documents: docsData, checkpoint: newCheckpoint } as any);
+        next: async (streamResponse: any) => {
+          pullStream$.next('RESYNC');
+          // const firstField = Object.keys(streamResponse.data)[0];
+          // const docsData = streamResponse.data[firstField];
+          // const newCheckpoint = getCheckpoint(
+          //   streamResponse.data[firstField],
+          //   {}
+          // );
+          // pullStream$.next({
+          //   documents: docsData,
+          //   checkpoint: newCheckpoint,
+          // } as any);
         },
         error: (error: any) => {
           pullStream$.error(error);
