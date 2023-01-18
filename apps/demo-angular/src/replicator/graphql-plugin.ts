@@ -1,10 +1,9 @@
 import { Client, createClient } from 'graphql-ws';
 import * as objectPath from 'object-path';
 import { RxCollection, SyncOptionsGraphQL, RxReplicationPullStreamItem, WithDeleted, RxReplicationWriteToMasterRow, fastUnsecureHash, ensureNotFalsy, RxPlugin, lastOfArray } from 'rxdb';
-import { startReplicationOnLeaderShip } from 'rxdb/dist/lib/plugins/replication';
-import { GRAPHQL_REPLICATION_PLUGIN_IDENTITY_PREFIX, GRAPHQL_WEBSOCKET_BY_URL, removeGraphQLWebSocketRef, RxGraphQLReplicationState } from 'rxdb/dist/lib/plugins/replication-graphql';
-import { ReplicationPullOptions, ReplicationPushOptions } from 'rxdb/dist/types/types';
-
+import { ReplicationPullOptions, ReplicationPushOptions } from 'rxdb/dist/types/types/plugins/replication';
+import { startReplicationOnLeaderShip } from 'rxdb/plugins/replication';
+import { GRAPHQL_REPLICATION_PLUGIN_IDENTITY_PREFIX, GRAPHQL_WEBSOCKET_BY_URL, removeGraphQLWebSocketRef, RxGraphQLReplicationState } from 'rxdb/plugins/replication-graphql';
 import { Subject } from 'rxjs';
 
 /**

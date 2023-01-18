@@ -1,0 +1,11 @@
+<ActionBar [title]="adapter"></ActionBar>
+<StackLayout class="p-20">
+  <ScrollView class="h-full">
+    <StackLayout>
+      <button text="Add Hero" (tap)="_rxdb.addHero()" class="btn btn-primary"></button>
+      <button text="Test Heros" (tap)="_rxdb.test()" class="btn btn-primary"></button>
+
+      <app-hero *ngFor="let hero of _rxdb.heros$ | async" [hero]="hero"></app-hero>
+    </StackLayout>
+  </ScrollView>
+</StackLayout>

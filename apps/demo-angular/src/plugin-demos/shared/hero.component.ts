@@ -1,8 +1,8 @@
 import { Component, inject, Input, NO_ERRORS_SCHEMA } from '@angular/core';
 import { NativeScriptCommonModule } from '@nativescript/angular';
 import { Dialogs } from '@nativescript/core';
-import { RxDBCoreService } from '../replicator/rxdb-service';
-import { RxHeroDocumentType } from '../schemas/hero.schema';
+import { RxDBCoreService } from '../../replicator/rxdb-service';
+import { RxHeroDocumentType } from '../../schemas/hero.schema';
 
 @Component({
   selector: 'app-hero',

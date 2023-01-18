@@ -1,7 +1,7 @@
 import { Inject, Injectable, InjectionToken, OnDestroy } from '@angular/core';
-import { Dialogs, isAndroid } from '@nativescript/core';
+import { Dialogs, isAndroid, isIOS } from '@nativescript/core';
 import { addRxPlugin, createRxDatabase, RxDatabase } from 'rxdb';
-import { distinctUntilChanged, Subject, takeUntil, tap } from 'rxjs';
+import { distinctUntilChanged, Subject, takeUntil } from 'rxjs';
 // Using customized replication plugin for Hasura backend
 // import { RxDBReplicationGraphQLPlugin } from "rxdb/plugins/replication-graphql";
 import { RxDBReplicationHasuraGraphQLPlugin } from './graphql-plugin';
@@ -69,9 +69,6 @@ export class RxDBCoreService implements OnDestroy {
         http: 'https://working-oriole-73.hasura.app/v1/graphql',
         ws: 'wss://working-oriole-73.hasura.app/v1/graphql',
       },
-      headers: {
-        // 'x-hasura-admin-secret': '2zWIdFAkt9O9OGnxqXTkPw14xkQC0jVCSWKRf9hB7OAkrlzz1l8idW9w7SfUPkZE',
-      },
       push: {
         batchSize,
         queryBuilder: pushQueryBuilder,
@@ -87,20 +84,14 @@ export class RxDBCoreService implements OnDestroy {
       deletedField: 'deleted',
     });
 
-    // this.replicationState.error$.pipe(takeUntil(this.destroy$), distinctUntilChanged()).subscribe((err) => {
-    //   console.dir(err);
-    // });
+    this.replicationState.error$.pipe(takeUntil(this.destroy$), distinctUntilChanged()).subscribe((err) => {
+      console.dir(err);
+    });
 
-    this.heros$ = this.database.heroes
-      .find({
-        selector: {},
-        sort: [{ name: 'asc' }],
-      })
-      .$.pipe(
-        tap((hero: any[]) => {
-          console.log(hero.map((e) => e.name));
-        })
-      );
+    this.heros$ = this.database.heroes.find({
+      selector: {},
+      sort: [{ name: 'asc' }],
+    }).$;
   }
 
   addHero() {
@@ -115,6 +106,57 @@ export class RxDBCoreService implements OnDestroy {
         });
       }
     });
+  }
+
+  async measure(name: string, action: () => Promise<void>, records: number) {
+    let start = 0;
+
+    if (isIOS) {
+      start = performance.now();
+    } else if (isAndroid) {
+      start = java.lang.System.currentTimeMillis();
+    }
+
+    await action();
+
+    let stop = 0;
+    if (isIOS) {
+      stop = performance.now();
+    } else if (isAndroid) {
+      stop = java.lang.System.currentTimeMillis();
+    }
+
+    const total = stop - start;
+    console.log(`total : ${total} ms (${name}, ${records} records)`);
+    console.log(`per record: ${total / records} ms`);
+  }
+
+  async test() {
+    console.log('testing start, platform ', isIOS ? 'ios' : 'android');
+    console.log('================================================================');
+    const writePromise = async () => {
+      const id = this.uuid();
+      for (let i = 0; i < 100; i++) {
+        const date = '2023-01-18T13:00:00.000Z';
+        const color = '#' + (0x1000000 + Math.random() * 0xffffff).toString(16).substr(1, 6);
+        await this.database?.heroes.upsert({
+          id: id,
+          name: `hero ${i}`,
+          color,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          deleted: false,
+        });
+      }
+    };
+    const readPromise = async () => {
+      for (let i = 0; i < 5000; i++) {
+        await this.database?.heroes.findOne().exec();
+      }
+    };
+    await this.measure('write', writePromise, 100);
+    await this.measure('read', readPromise, 5000);
+    console.log('testing end');
   }
 
   ngOnDestroy(): void {

@@ -13,16 +13,10 @@ export class HomeComponent {
       name: 'sqlite-rxstorage',
     },
     {
-      name: 'nativescript-md5',
-    },
-    {
       name: 'rxstorage-memory',
     },
     {
       name: 'pouchdb-sqlite',
-    },
-    {
-      name: 'requery-sqlite',
     },
   ];
 }

@@ -1,11 +1,16 @@
-import { Component } from '@angular/core';
+import { Component, NO_ERRORS_SCHEMA } from '@angular/core';
 import { getRxStorageLoki } from 'rxdb/plugins/lokijs';
 import { RxDBCoreService, RXDB_STORAGE } from '../../replicator/rxdb-service';
 import { LokiNativescriptAdapter } from '@herefishyfish/nativescript-lokijs';
+import { NativeScriptCommonModule } from '@nativescript/angular';
+import { HeroComponent } from '../shared/hero.component';
 
 @Component({
   selector: 'demo-nativescript-lokijs',
-  templateUrl: 'lokijs-rxstorage.component.html',
+  templateUrl: '../shared/hero.page.html',
+  standalone: true,
+  schemas: [NO_ERRORS_SCHEMA],
+  imports: [NativeScriptCommonModule, HeroComponent],
   providers: [
     RxDBCoreService,
     {
@@ -20,5 +25,6 @@ import { LokiNativescriptAdapter } from '@herefishyfish/nativescript-lokijs';
   ],
 })
 export class NativescriptLokijsRxstorageComponent {
+  adapter = 'LokiJS RxStorage Adapter';
   constructor(public _rxdb: RxDBCoreService) {}
 }

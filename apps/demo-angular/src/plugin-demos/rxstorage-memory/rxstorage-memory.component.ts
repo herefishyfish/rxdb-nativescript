@@ -1,10 +1,16 @@
-import { Component, NgZone } from '@angular/core';
+import { Component, NgZone, NO_ERRORS_SCHEMA } from '@angular/core';
 import { DemoSharedNativescriptSqliteRxstorageAdapter } from '@demo/shared';
+import { NativeScriptCommonModule } from '@nativescript/angular';
 import { getRxStorageMemory } from 'rxdb/plugins/memory';
 import { RxDBCoreService, RXDB_STORAGE } from '../../replicator/rxdb-service';
+import { HeroComponent } from '../shared/hero.component';
+
 @Component({
   selector: 'demo-nativescript-rxstorage-memory',
-  templateUrl: 'rxstorage-memory.component.html',
+  templateUrl: '../shared/hero.page.html',
+  standalone: true,
+  schemas: [NO_ERRORS_SCHEMA],
+  imports: [NativeScriptCommonModule, HeroComponent],
   providers: [
     RxDBCoreService,
     {
@@ -16,11 +22,7 @@ import { RxDBCoreService, RXDB_STORAGE } from '../../replicator/rxdb-service';
   ],
 })
 export class NativeScriptRxStorageMemoryComponent {
-  demoShared: DemoSharedNativescriptSqliteRxstorageAdapter;
+  adapter = 'RxStorage Memory Adapter';
 
-  constructor(private _ngZone: NgZone, public _rxdb: RxDBCoreService) {}
-
-  ngOnInit() {
-    this.demoShared = new DemoSharedNativescriptSqliteRxstorageAdapter();
-  }
+  constructor(public _rxdb: RxDBCoreService) {}
 }
