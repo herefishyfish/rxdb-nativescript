@@ -9,5 +9,6 @@
     "nativescript-rxdb": "packages/nativescript-rxdb",
     "nativescript-sqlite-rxstorage-adapter": "packages/nativescript-sqlite-rxstorage-adapter",
     "requery-sqlite": "packages/requery-sqlite"
-  }
+  },
+  "$schema": "./node_modules/nx/schemas/workspace-schema.json"
 }
