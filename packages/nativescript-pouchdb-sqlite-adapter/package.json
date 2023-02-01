@@ -31,5 +31,26 @@
   "license": "Apache-2.0",
   "homepage": "https://github.com/herefishyfish/rxdb-nativescript",
   "readmeFilename": "README.md",
-  "bootstrapper": "@nativescript/plugin-seed"
+  "bootstrapper": "@nativescript/plugin-seed",
+  "dependencies": {
+    "assert": "^2.0.0",
+    "base-64": "^1.0.0",
+    "browser-assert": "^1.2.1",
+    "browserify-zlib": "^0.2.0",
+    "buffer": "^6.0.3",
+    "crypto-browserify": "^3.12.0",
+    "events": "^3.3.0",
+    "graphql": "^16.5.0",
+    "https-browserify": "^1.0.0",
+    "net": "^1.0.2",
+    "os-browserify": "^0.3.0",
+    "path-browserify": "^1.0.1",
+    "process": "^0.11.10",
+    "stream-browserify": "^3.0.0",
+    "stream-http": "^3.2.0",
+    "tslib": "^2.4.0",
+    "tty-browserify": "0.0.1",
+    "util": "^0.12.4",
+    "vm-browserify": "^1.1.2"
+  }
 }
