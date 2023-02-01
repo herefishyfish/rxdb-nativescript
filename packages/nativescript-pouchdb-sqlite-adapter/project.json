@@ -9,11 +9,16 @@
         "outputPath": "dist/packages/nativescript-pouchdb-sqlite-adapter",
         "tsConfig": "packages/nativescript-pouchdb-sqlite-adapter/tsconfig.json",
         "packageJson": "packages/nativescript-pouchdb-sqlite-adapter/package.json",
-        "main": "packages/nativescript-pouchdb-sqlite-adapter/index.d.ts",
+        "main": "packages/nativescript-pouchdb-sqlite-adapter/index.js",
         "assets": [
           "packages/nativescript-pouchdb-sqlite-adapter/*.md",
           "packages/nativescript-pouchdb-sqlite-adapter/index.d.ts",
           "LICENSE",
+          {
+            "glob": "**/*.js",
+            "input": "packages/nativescript-pouchdb-sqlite-adapter/",
+            "output": "./"
+          },
           {
             "glob": "**/*",
             "input": "packages/nativescript-pouchdb-sqlite-adapter/platforms/",

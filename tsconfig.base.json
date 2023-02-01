@@ -25,7 +25,7 @@
       "@herefishyfish/*": ["packages/*"],
       "@herefishyfish/nativescript-lokijs": ["packages/nativescript-lokijs/index.d.ts"],
       "@herefishyfish/nativescript-md5": ["packages/nativescript-md5/index.d.ts"],
-      "@herefishyfish/nativescript-pouchdb-sqlite-adapter": ["packages/nativescript-pouchdb-sqlite-adapter/index.d.ts"],
+      "@herefishyfish/nativescript-pouchdb-sqlite-adapter": ["packages/nativescript-pouchdb-sqlite-adapter"],
       "@herefishyfish/nativescript-rxdb": ["packages/nativescript-rxdb/index.d.ts"],
       "@herefishyfish/nativescript-sqlite-rxstorage-adapter": ["packages/nativescript-sqlite-rxstorage-adapter/index.d.ts"],
       "nativescript-rxstorage-sqlite-adapter": ["packages/nativescript-rxstorage-sqlite-adapter/index.d.ts"],
