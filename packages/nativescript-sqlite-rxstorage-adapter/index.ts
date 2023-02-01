@@ -3,12 +3,22 @@ import { knownFolders, path } from '@nativescript/core';
 import { openOrCreate, SQLiteDatabase } from '@herefishyfish/requery-sqlite';
 import { SQLiteBasics } from 'rxdb-premium/dist/lib/plugins/sqlite';
 
-export const getSQLiteBasicsNativeScript = (): SQLiteBasics<SQLiteDatabase> => {
+export interface SQLiteOptions {
+  threading?: boolean;
+  transformBlobs?: boolean;
+  flags?: number;
+}
+
+export const getSQLiteBasicsNativeScript = (options?: SQLiteOptions): SQLiteBasics<SQLiteDatabase> => {
   return {
     open: async (name: string) => {
-      return await openOrCreate(path.join(knownFolders.documents().getFolder('db').path, `${name}.sqlite`), {
-        transformBlobs: true,
-      });
+      return await openOrCreate(
+        path.join(knownFolders.documents().getFolder('db').path, `${name}.sqlite`),
+        options ?? {
+          threading: true,
+          transformBlobs: true,
+        }
+      );
     },
     all: async (db: SQLiteDatabase, queryWithParams: SQLiteQueryWithParams) => {
       return (await db.select(queryWithParams.query, queryWithParams.params ?? [])) as any;
