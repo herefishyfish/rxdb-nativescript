@@ -1,7 +1,7 @@
 import { Component, NO_ERRORS_SCHEMA } from '@angular/core';
 import { getSQLiteBasicsNativeScript } from '@herefishyfish/nativescript-sqlite-rxstorage-adapter';
 import { NativeScriptCommonModule } from '@nativescript/angular';
-import { getRxStorageSQLite } from 'rxdb-premium/plugins/sqlite';
+import { getRxStorageSQLite } from 'rxdb-premium/plugins/storage-sqlite';
 import { RxDBCoreService, RXDB_STORAGE } from '../../replicator/rxdb-service';
 import { HeroComponent } from '../shared/hero.component';
 

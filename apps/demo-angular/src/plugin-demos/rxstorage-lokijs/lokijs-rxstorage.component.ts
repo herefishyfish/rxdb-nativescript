@@ -1,5 +1,5 @@
 import { Component, NO_ERRORS_SCHEMA } from '@angular/core';
-import { getRxStorageLoki } from 'rxdb/plugins/lokijs';
+import { getRxStorageLoki } from 'rxdb/plugins/storage-lokijs';
 import { RxDBCoreService, RXDB_STORAGE } from '../../replicator/rxdb-service';
 import { LokiNativescriptAdapter } from '@herefishyfish/nativescript-lokijs';
 import { NativeScriptCommonModule } from '@nativescript/angular';
