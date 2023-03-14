@@ -1,6 +1,6 @@
 {
   "name": "@herefishyfish/nativescript-sqlite-rxstorage-adapter",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Add a plugin description",
   "main": "index",
   "typings": "index.d.ts",
