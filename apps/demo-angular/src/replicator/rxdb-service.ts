@@ -1,21 +1,30 @@
 import { Inject, Injectable, InjectionToken, OnDestroy } from '@angular/core';
 import { Dialogs, isAndroid, isIOS } from '@nativescript/core';
-import { addRxPlugin, createRxDatabase, RxDatabase } from 'rxdb';
+import { addRxPlugin, createRxDatabase, lastOfArray, RxDatabase, RxDocument } from 'rxdb';
 import { distinctUntilChanged, Subject, takeUntil } from 'rxjs';
 // Using customized replication plugin for Hasura backend
-// import { RxDBReplicationGraphQLPlugin } from "rxdb/plugins/replication-graphql";
-import { RxDBReplicationHasuraGraphQLPlugin } from './graphql-plugin';
+import { replicateGraphQL } from 'rxdb/plugins/replication-graphql';
+// import { RxDBReplicationHasuraGraphQLPlugin } from './graphql-plugin';
 import { RxDBQueryBuilderPlugin } from 'rxdb/plugins/query-builder';
 import { pullQueryBuilder, pushQueryBuilder, pullStreamQueryBuilder } from './query-builder';
-import { HERO_SCHEMA } from '../schemas/hero.schema';
+import { HERO_SCHEMA, RxHeroDocumentType } from '../schemas/hero.schema';
+import { RxDBDevModePlugin } from 'rxdb/plugins/dev-mode';
 
-const batchSize = 10;
+const batchSize = 100;
 
 export interface RxDBStorage {
   getRxDBStorage();
 }
 
 export const RXDB_STORAGE = new InjectionToken<RxDBStorage>('RXDB_STORAGE');
+
+function getCheckpoint(data: any[], lastCheckpoint) {
+  const lastDoc = lastOfArray(data);
+  return {
+    id: lastDoc?.id ?? lastCheckpoint?.id ?? '',
+    updatedAt: lastDoc?.updatedAt ?? lastCheckpoint?.updatedAt ?? new Date(0).toISOString(),
+  };
+}
 
 @Injectable()
 export class RxDBCoreService implements OnDestroy {
@@ -26,7 +35,9 @@ export class RxDBCoreService implements OnDestroy {
 
   constructor(@Inject(RXDB_STORAGE) private rxdbStorage: RxDBStorage) {
     addRxPlugin(RxDBQueryBuilderPlugin);
-    addRxPlugin(RxDBReplicationHasuraGraphQLPlugin);
+    addRxPlugin(RxDBDevModePlugin);
+
+    // addRxPlugin(RxDBReplicationHasuraGraphQLPlugin);
     this.initDb();
   }
 
@@ -54,7 +65,7 @@ export class RxDBCoreService implements OnDestroy {
         statics: {
           async addHero(name, color) {
             return this.upsert({
-              uuid: this.uuid(),
+              id: this.uuid(),
               name,
               color,
             });
@@ -64,7 +75,14 @@ export class RxDBCoreService implements OnDestroy {
     });
 
     console.log('Creating Replication');
-    this.replicationState = await this.database.heroes.syncGraphQL({
+    this.replicationState = replicateGraphQL<
+      RxHeroDocumentType,
+      {
+        id: string;
+        updatedAt: string;
+      }
+    >({
+      collection: this.database.heroes,
       url: {
         http: 'https://working-oriole-73.hasura.app/v1/graphql',
         ws: 'wss://working-oriole-73.hasura.app/v1/graphql',
@@ -72,15 +90,24 @@ export class RxDBCoreService implements OnDestroy {
       push: {
         batchSize,
         queryBuilder: pushQueryBuilder,
+        responseModifier: (response) => {
+          return [];
+        },
       },
       pull: {
         batchSize,
         queryBuilder: pullQueryBuilder,
         streamQueryBuilder: pullStreamQueryBuilder,
+        responseModifier: (response, source, requestCheckpoint) => {
+          return {
+            checkpoint: getCheckpoint(response, requestCheckpoint),
+            documents: response,
+          };
+        },
       },
       live: true,
       autoStart: true,
-      // liveInterval: 1000 * 1, // 1 minute
+      waitForLeadership: false,
       deletedField: 'deleted',
     });
 

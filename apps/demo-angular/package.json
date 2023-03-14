@@ -11,7 +11,7 @@
     "@herefishyfish/requery-sqlite": "file:../../dist/packages/requery-sqlite"
   },
   "devDependencies": {
-    "@nativescript/android": "~8.4.0",
+    "@nativescript/android": "beta",
     "@nativescript/ios": "~8.4.0"
   }
 }

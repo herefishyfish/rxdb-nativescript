@@ -1,7 +1,7 @@
 type SQLiteQueryWithParams = any;
 import { knownFolders, path } from '@nativescript/core';
 import { openOrCreate, SQLiteDatabase } from '@herefishyfish/requery-sqlite';
-import { SQLiteBasics } from 'rxdb-premium/plugins/sqlite';
+import { SQLiteBasics } from 'rxdb-premium/plugins/storage-sqlite';
 
 export interface ISQLiteDatabaseAdapterOptions {
   transformBlobs?: boolean;
@@ -11,6 +11,9 @@ export interface ISQLiteDatabaseAdapterOptions {
 
 export const getSQLiteBasicsNativeScript = (options?: ISQLiteDatabaseAdapterOptions): SQLiteBasics<SQLiteDatabase> => {
   return {
+    setPragma: async (db, key, value) => {
+      return db.execute(`PRAGMA ${key} = ${value}`) as any;
+    },
     open: async (name: string) => {
       return await openOrCreate(path.join(knownFolders.documents().getFolder('db').path, `${name}.sqlite`), {
         transformBlobs: true,

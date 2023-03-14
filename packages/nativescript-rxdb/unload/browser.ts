@@ -1,11 +1,7 @@
 import { Application } from '@nativescript/core';
 
-function add(fn) {
+export function addBrowser(fn) {
   Application.on('exit', function () {
     fn();
   });
 }
-
-export default {
-  add,
-};

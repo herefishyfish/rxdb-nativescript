@@ -1,7 +1,7 @@
 import { Component, NgZone, NO_ERRORS_SCHEMA } from '@angular/core';
 import { DemoSharedNativescriptSqliteRxstorageAdapter } from '@demo/shared';
 import { NativeScriptCommonModule } from '@nativescript/angular';
-import { getRxStorageMemory } from 'rxdb/plugins/memory';
+import { getRxStorageMemory } from 'rxdb/plugins/storage-memory';
 import { RxDBCoreService, RXDB_STORAGE } from '../../replicator/rxdb-service';
 import { HeroComponent } from '../shared/hero.component';
 
