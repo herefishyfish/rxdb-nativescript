@@ -16,6 +16,13 @@ import { Subject } from 'rxjs';
  *
  * Original plugin: https://github.com/pubkey/rxdb/tree/master/src/plugins/replication-graphql
  */
+/**
+ * UPDATE: 2023-03-16
+ *
+ * Hasura added in streaming support for GraphQL subscriptions. This means we can
+ * use the standard GraphQL replication plugin with the standard modifiers. This
+ * plugin is no longer required.
+ */
 
 /**
  * Standard getGraphQLWebSocket definition doesn't allow adding connection params only the url.

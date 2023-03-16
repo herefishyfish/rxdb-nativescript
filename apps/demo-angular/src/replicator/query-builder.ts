@@ -46,9 +46,12 @@ export const pullQueryBuilder = (checkpoint, limit) => {
   };
 };
 
-export const pullStreamQueryBuilder = () => {
+export const pullStreamQueryBuilder = (headers) => {
+  const limit = 10;
+  const sortByValue = new Date().toISOString();
+
   const query = `subscription HeroSubscription {
-    hero(order_by: {updatedAt: asc}) {
+    hero_stream(cursor: {initial_value: {updatedAt: "${sortByValue}"}}, batch_size: ${limit}) {
       color
       createdAt
       deleted
