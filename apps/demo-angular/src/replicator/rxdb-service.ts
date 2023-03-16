@@ -2,9 +2,7 @@ import { Inject, Injectable, InjectionToken, OnDestroy } from '@angular/core';
 import { Dialogs, isAndroid, isIOS } from '@nativescript/core';
 import { addRxPlugin, createRxDatabase, lastOfArray, RxDatabase, RxDocument } from 'rxdb';
 import { distinctUntilChanged, Subject, takeUntil } from 'rxjs';
-// Using customized replication plugin for Hasura backend
 import { replicateGraphQL } from 'rxdb/plugins/replication-graphql';
-// import { RxDBReplicationHasuraGraphQLPlugin } from './graphql-plugin';
 import { RxDBQueryBuilderPlugin } from 'rxdb/plugins/query-builder';
 import { pullQueryBuilder, pushQueryBuilder, pullStreamQueryBuilder } from './query-builder';
 import { HERO_SCHEMA, RxHeroDocumentType } from '../schemas/hero.schema';
@@ -37,7 +35,6 @@ export class RxDBCoreService implements OnDestroy {
     addRxPlugin(RxDBQueryBuilderPlugin);
     addRxPlugin(RxDBDevModePlugin);
 
-    // addRxPlugin(RxDBReplicationHasuraGraphQLPlugin);
     this.initDb();
   }
 
