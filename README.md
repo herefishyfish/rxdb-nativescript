@@ -33,7 +33,11 @@ npm i @herefishyfish/nativescript-rxdb
 3. Refer to the RxDB documentation for how to use RxDB.
 
 ### Demos
-You can check out the demos at: https://stackblitz.com/@herefishyfish/collections/rxdb
+You can check out the demos within this repo
+```js
+nx run demo-angular:[android|ios]
+```
+or on [stackblitz](https://stackblitz.com/@herefishyfish/collections/rxdb)
 
 ## How to develop?
 
