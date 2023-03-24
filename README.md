@@ -1,6 +1,6 @@
-NativeScript RxDB Plugins
+# NativeScript RxDB Plugins
 
-# What is this?
+## What is this?
 This is a suite of plugins that provide RxDB support for NativeScript, it includes:
 
 ## Core plugin:
@@ -14,7 +14,7 @@ Adapters:
 - [@herefishyfish/nativescript-sqlite-rxstorage-adapter](packages/nativescript-sqlite-rxstorage-adapter/README.md)
 - [@herefishyfish/requery-sqlite](packages/requery-sqlite/README.md)
 
-# How to use?
+## How to use?
 
 Install the core plugin
 
@@ -23,10 +23,10 @@ npm i @herefishyfish/nativescript-rxdb
 ```
 Install the adapter you want to use, then refer to the RxDB docs for how to use RxDB.
 
-# Demos
+## Demos
 https://stackblitz.com/@herefishyfish/collections/rxdb
 
-# How to develop?
+## How to develop?
 
 This workspace manages the suite of plugins listed above. 
 
