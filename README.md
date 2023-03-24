@@ -1,30 +1,39 @@
 # NativeScript RxDB Plugins
 
-## What is this?
-This is a suite of plugins that provide RxDB support for NativeScript, it includes:
+## What are NativeScript RxDB Plugins?
 
-## Core plugin:
-The compatibility layer for RxDB to work with NativeScript. This is the core plugin that all the other plugins depend on.
+NativeScript RxDB Plugins are a set of plugins that enable RxDB support for NativeScript. This set of plugins includes a core plugin and adapters for different databases.
+
+### Core plugin
+
+The core plugin provides the compatibility layer for RxDB to work with NativeScript. This plugin is a prerequisite for using any of the other plugins.
+
 - [@herefishyfish/nativescript-rxdb](packages/nativescript-rxdb/README.md)
 
-Adapters:
+### Adapters
+
+NativeScript RxDB Plugins also provide adapters for different databases to work with NativeScript, including:
+
 - [@herefishyfish/nativescript-lokijs-adapter](packages/nativescript-lokijs/README.md)
 - [@herefishyfish/nativescript-md5](packages/nativescript-md5/README.md)
 - [@herefishyfish/nativescript-pouchdb-sqlite-adapter](packages/nativescript-pouchdb-sqlite-adapter/README.md)
 - [@herefishyfish/nativescript-sqlite-rxstorage-adapter](packages/nativescript-sqlite-rxstorage-adapter/README.md)
 - [@herefishyfish/requery-sqlite](packages/requery-sqlite/README.md)
 
-## How to use?
+### How to use NativeScript RxDB Plugins?
 
-Install the core plugin
+1. Install the core plugin using npm:
 
 ```javascript
 npm i @herefishyfish/nativescript-rxdb
 ```
-Install the adapter you want to use, then refer to the RxDB docs for how to use RxDB.
 
-## Demos
-https://stackblitz.com/@herefishyfish/collections/rxdb
+2. Install the adapter you want to use.
+
+3. Refer to the RxDB documentation for how to use RxDB.
+
+### Demos
+You can check out the demos at: https://stackblitz.com/@herefishyfish/collections/rxdb
 
 ## How to develop?
 
