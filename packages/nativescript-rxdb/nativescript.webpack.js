@@ -12,9 +12,6 @@ module.exports = (webpack) => {
       },
     ]);
 
-    console.log('nodeModulesPath', nodeModulesPath);
-    console.log('appRoot.path', appRoot.path);
-
     // Fix and patch imports
     config.resolve.alias.set('ws', resolve(nodeModulesPath, '@valor/nativescript-websockets'));
     config.resolve.alias.set('pouchdb-md5', resolve(nodeModulesPath, '@herefishyfish/nativescript-rxdb/pouchdb'));
