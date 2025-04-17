@@ -3,11 +3,12 @@ import { NativeScriptCommonModule } from '@nativescript/angular';
 import { Dialogs } from '@nativescript/core';
 import { RxDBCoreService } from '../../replicator/rxdb-service';
 import { RxHeroDocumentType } from '../../schemas/hero.schema';
+import { RxDocument } from 'rxdb';
 
 @Component({
   selector: 'app-hero',
   template: `
-    <StackLayout class="hero-card" (tap)="onTap()" orientation="horizontal">
+    <StackLayout class="hero-card" (tap)="onTap()" (longPress)="deleteHero()" orientation="horizontal">
       <Label text="{{ hero?.name }}'s favorite color is: " textWrap="true"></Label>
       <StackLayout width="20" height="20" [backgroundColor]="hero?.color"></StackLayout>
     </StackLayout>
@@ -30,7 +31,7 @@ import { RxHeroDocumentType } from '../../schemas/hero.schema';
   schemas: [NO_ERRORS_SCHEMA],
 })
 export class HeroComponent {
-  @Input() hero!: RxHeroDocumentType;
+  @Input() hero!: RxDocument<RxHeroDocumentType>;
   _rxdb = inject(RxDBCoreService);
 
   onTap() {
@@ -42,6 +43,19 @@ export class HeroComponent {
           name: promptResult.text,
           updatedAt: new Date().toISOString(),
         });
+      }
+    });
+  }
+
+  deleteHero() {
+    Dialogs.confirm({
+      title: 'Delete hero',
+      message: `Are you sure you want to delete ${this.hero.name}?`,
+      cancelButtonText: 'Cancel',
+      okButtonText: 'Delete',
+    }).then((result) => {
+      if (result) {
+        this.hero.remove();
       }
     });
   }

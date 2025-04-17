@@ -1,7 +1,8 @@
-import { Inject, Injectable, InjectionToken, OnDestroy } from '@angular/core';
+import { Inject, Injectable, InjectionToken, Injector, OnDestroy, Signal, untracked } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { Dialogs, isAndroid, isIOS } from '@nativescript/core';
-import { addRxPlugin, createRxDatabase, lastOfArray, RxDatabase, RxDocument } from 'rxdb';
-import { distinctUntilChanged, Subject, takeUntil } from 'rxjs';
+import { addRxPlugin, createRxDatabase, lastOfArray, RxDatabase, RxDocument, RxReactivityFactory } from 'rxdb';
+import { distinctUntilChanged, Observable, Subject, takeUntil } from 'rxjs';
 import { replicateGraphQL } from 'rxdb/plugins/replication-graphql';
 import { RxDBQueryBuilderPlugin } from 'rxdb/plugins/query-builder';
 import { pullQueryBuilder, pushQueryBuilder, pullStreamQueryBuilder } from './query-builder';
@@ -31,35 +32,49 @@ export class RxDBCoreService implements OnDestroy {
   database: RxDatabase;
   private destroy$ = new Subject<void>();
 
-  constructor(@Inject(RXDB_STORAGE) private rxdbStorage: RxDBStorage) {
+  constructor(@Inject(RXDB_STORAGE) private rxdbStorage: RxDBStorage, private injector: Injector) {
     addRxPlugin(RxDBQueryBuilderPlugin);
     addRxPlugin(RxDBDevModePlugin);
 
-    this.initDb();
+    this.initDb(this.injector);
   }
 
   uuid() {
-    if (isAndroid) {
-      return java.util.UUID.randomUUID().toString();
-    } else {
-      return NSUUID.UUID().UUIDString.toLowerCase();
-    }
+    return crypto.randomUUID();
   }
 
-  async initDb() {
+  async initDb(injector: Injector) {
+    const reactivityFactory: RxReactivityFactory<Signal<any>> = {
+      fromObservable(obs, initialValue: any) {
+        return untracked(() =>
+          toSignal(obs, {
+            initialValue,
+            injector,
+            rejectErrors: true,
+          })
+        );
+      },
+    };
+
+    const { wrappedValidateAjvStorage } = await import('rxdb/plugins/validate-ajv');
+    const storage = wrappedValidateAjvStorage({
+      storage: this.rxdbStorage as any,
+    });
+
     console.log('Creating Database');
     this.database = await createRxDatabase({
       name: 'exampledb',
-      storage: this.rxdbStorage as any,
+      storage: storage,
       multiInstance: false,
       ignoreDuplicate: true,
+      reactivity: reactivityFactory,
     });
 
     console.log('Creating Collections');
     await this.database.addCollections({
       heroes: {
         schema: HERO_SCHEMA,
-        statics: {
+        methods: {
           async addHero(name, color) {
             return this.upsert({
               id: this.uuid(),
@@ -81,8 +96,8 @@ export class RxDBCoreService implements OnDestroy {
     >({
       collection: this.database.heroes,
       url: {
-        http: 'https://working-oriole-73.hasura.app/v1/graphql',
-        ws: 'wss://working-oriole-73.hasura.app/v1/graphql',
+        http: 'https://together-seahorse-29.hasura.app/v1/graphql',
+        ws: 'wss://together-seahorse-29.hasura.app/v1/graphql',
       },
       push: {
         batchSize,
@@ -105,6 +120,7 @@ export class RxDBCoreService implements OnDestroy {
       live: true,
       autoStart: true,
       waitForLeadership: false,
+      replicationIdentifier: 'rxdbHeroesReplication',
       deletedField: 'deleted',
     });
 
@@ -163,13 +179,12 @@ export class RxDBCoreService implements OnDestroy {
       for (let i = 0; i < 100; i++) {
         const date = '2023-01-18T13:00:00.000Z';
         const color = '#' + (0x1000000 + Math.random() * 0xffffff).toString(16).substr(1, 6);
-        await this.database?.heroes.upsert({
+        await this.database.heroes.upsert({
           id: id,
           name: `hero ${i}`,
           color,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
-          deleted: false,
         });
       }
     };
@@ -186,6 +201,6 @@ export class RxDBCoreService implements OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
-    this.database.destroy();
+    this.database.remove();
   }
 }

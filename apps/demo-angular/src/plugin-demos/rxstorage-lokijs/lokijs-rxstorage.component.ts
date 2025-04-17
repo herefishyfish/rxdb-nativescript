@@ -1,30 +1,32 @@
 import { Component, NO_ERRORS_SCHEMA } from '@angular/core';
-import { getRxStorageLoki } from 'rxdb/plugins/storage-lokijs';
-import { RxDBCoreService, RXDB_STORAGE } from '../../replicator/rxdb-service';
-import { LokiNativescriptAdapter } from '@herefishyfish/nativescript-lokijs';
+// import { getRxStorageLoki } from 'rxdb/plugins/storage-lokijs';
 import { NativeScriptCommonModule } from '@nativescript/angular';
-import { HeroComponent } from '../shared/hero.component';
 
 @Component({
   selector: 'demo-nativescript-lokijs',
-  templateUrl: '../shared/hero.page.html',
+  // templateUrl: '../shared/hero.page.html',
+  template: `<StackLayout>
+    <Label class="h3"> LokiJS RxStorage Adapter (deprecated)</Label>
+    <Label> This adapter was removed in version 16+ </Label>
+    <Label> You will need to use 15 or lower if you want to use LokiJS </Label>
+  </StackLayout> `,
   standalone: true,
   schemas: [NO_ERRORS_SCHEMA],
-  imports: [NativeScriptCommonModule, HeroComponent],
-  providers: [
-    RxDBCoreService,
-    {
-      provide: RXDB_STORAGE,
-      useFactory: () => {
-        return getRxStorageLoki({
-          env: 'NATIVESCRIPT',
-          adapter: new LokiNativescriptAdapter(),
-        });
-      },
-    },
-  ],
+  imports: [NativeScriptCommonModule],
+  // providers: [
+  //   RxDBCoreService,
+  //   {
+  //     provide: RXDB_STORAGE,
+  //     useFactory: () => {
+  //       return getRxStorageLoki({
+  //         env: 'NATIVESCRIPT',
+  //         adapter: new LokiNativescriptAdapter(),
+  //       });
+  //     },
+  //   },
+  // ],
 })
 export class NativescriptLokijsRxstorageComponent {
-  adapter = 'LokiJS RxStorage Adapter';
-  constructor(public _rxdb: RxDBCoreService) {}
+  adapter = 'LokiJS RxStorage Adapter (deprecated)';
+  // constructor(public _rxdb: RxDBCoreService) {}
 }

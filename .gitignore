@@ -5,6 +5,9 @@
 /tmp
 /out-tsc
 
+.env
+
+
 # dependencies
 node_modules
 package-lock.json
@@ -42,3 +45,5 @@ Thumbs.db
 
 *.tgz
 packages/**/angular/dist
+
+.nx/cache

@@ -18,5 +18,9 @@ import '@nativescript/zone-js/dist/pre-zone-polyfills';
 // Zone JS is required by default for Angular itself
 import 'zone.js';
 
+import './zone-disable';
+
+import 'zone.js/plugins/zone-patch-rxjs';
+
 // Add NativeScript specific Zone JS patches
 import '@nativescript/zone-js';

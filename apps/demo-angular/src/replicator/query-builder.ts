@@ -1,11 +1,11 @@
 export const pushQueryBuilder = (docs) => {
   // remove rxdb metadata before push
   const query = `mutation
-    hero ($doc: [hero_insert_input!]!) {
-      insert_hero(
+    InsertHero ($doc: [heroes_insert_input!]!) {
+      insert_heroes(
         objects: $doc,
         on_conflict: {
-          constraint: hero_pkey,
+          constraint: heroes_pkey,
           update_columns: [
             name, color, deleted, updatedAt, createdAt
           ]
@@ -29,8 +29,8 @@ export const pushQueryBuilder = (docs) => {
 export const pullQueryBuilder = (checkpoint, limit) => {
   // the first pull does not have a start-document
   const sortByValue = checkpoint ? checkpoint['updatedAt'] : new Date(0).toISOString();
-  const query = `query MyQuery {
-    hero(where: {updatedAt: {_gt: "${sortByValue}"}}, order_by: {updatedAt: asc}, limit: ${limit}) {
+  const query = `query GetHeroes {
+    heroes(where: {updatedAt: {_gt: "${sortByValue}"}}, order_by: {updatedAt: asc}, limit: ${limit}) {
       color
       createdAt
       deleted
@@ -51,7 +51,7 @@ export const pullStreamQueryBuilder = (headers) => {
   const sortByValue = new Date().toISOString();
 
   const query = `subscription HeroSubscription {
-    hero_stream(cursor: {initial_value: {updatedAt: "${sortByValue}"}}, batch_size: ${limit}) {
+    heroes_stream(cursor: {initial_value: {updatedAt: "${sortByValue}"}}, batch_size: ${limit}) {
       color
       createdAt
       deleted

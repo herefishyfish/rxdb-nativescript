@@ -1,6 +1,4 @@
-import { SqliteParam, SqliteParams, SqliteRow, paramsToStringArray, throwError } from './sqlite.common';
-
-declare const strlen: any;
+import { SQLiteDatabase as ISQLiteDatabase, SqliteParam, SqliteParams, SqliteRow, paramsToStringArray, throwError } from './sqlite.common';
 
 const iosProperty = <T extends any>(_self, property: T): T => {
   if (typeof property === 'function') {
@@ -12,13 +10,13 @@ const iosProperty = <T extends any>(_self, property: T): T => {
   }
 };
 
-const toCharPtr = (str: string) => {
-  const objcStr = NSString.stringWithString(str);
-  const size = strlen(objcStr.UTF8String) + 1;
-  const buffer = interop.alloc(size) as any;
-  objcStr.getCStringMaxLengthEncoding(buffer, size, NSUTF8StringEncoding);
-  return buffer;
-};
+// const toCharPtr = (str: string) => {
+//     const objcStr = NSString.stringWithString(str);
+//     const size = strlen(objcStr.UTF8String) + 1;
+//     const buffer = interop.alloc(size) as any;
+//     objcStr.getCStringMaxLengthEncoding(buffer, size, NSUTF8StringEncoding);
+//     return buffer;
+// };
 
 interface CursorStatement {
   built: boolean;
@@ -405,47 +403,56 @@ async function transactionRaw<T = any>(db: FMDatabase, action: (cancel?: () => v
     if (isFirstTransaction) {
       execRaw(db, 'ROLLBACK TRANSACTION');
     }
-    throwError(`transaction: ${e}`);
+    throwError(e);
     return null;
   }
 }
 
-export class SQLiteDatabase {
+export class SQLiteDatabase implements ISQLiteDatabase {
   db: FMDatabase;
   transformBlobs: boolean;
+  filePath: string;
   constructor(
-    public filePath: string,
+    filePathOrDb: string | FMDatabase,
     options?: {
       threading?: boolean;
       transformBlobs?: boolean;
       readOnly?: boolean;
     }
   ) {
+    if (filePathOrDb instanceof FMDatabase) {
+      this.db = filePathOrDb;
+      this.filePath = filePathOrDb.databaseURL.absoluteString;
+      this.isOpen = this.db.isOpen;
+    } else {
+      this.filePath = filePathOrDb;
+    }
     this.transformBlobs = !options || options.transformBlobs !== false;
   }
   isOpen = false;
-  async open() {
+  open() {
     if (!this.db) {
       this.db = FMDatabase.databaseWithPath(getRealPath(this.filePath));
     }
+    this.isOpen = this.db.isOpen;
     if (!this.isOpen) {
       this.isOpen = this.db.open();
     }
     return this.isOpen;
   }
-  async close() {
+  close() {
     if (!this.isOpen) return;
     this.db.close();
     // sqlite3_close_v2(db);
     this.db = null;
     this.isOpen = false;
   }
-  async setVersion(version: number) {
+  setVersion(version: number) {
     this.db.userVersion = version + 0;
     // const query = "PRAGMA user_version=" + (version + 0).toString();
     // execRaw(this.db, query);
   }
-  async getVersion() {
+  getVersion() {
     // const query = "PRAGMA user_version";
     // const result = this.getArray(query);
     // return result && (result[0] as number);
@@ -472,12 +479,20 @@ export class SQLiteDatabase {
   _isInTransaction = false;
   async transaction<T = any>(action: (cancel?: () => void) => Promise<T>): Promise<T> {
     let res;
-    if (!this._isInTransaction) {
-      this._isInTransaction = true;
-      res = transactionRaw(this.db, action, true);
-      this._isInTransaction = false;
-    } else {
-      res = transactionRaw(this.db, action, false);
+    let shouldFinishTransaction = false;
+    try {
+      if (!this._isInTransaction) {
+        this._isInTransaction = shouldFinishTransaction = true;
+        res = await transactionRaw(this.db, action, true);
+      } else {
+        res = await transactionRaw(this.db, action, false);
+      }
+    } catch (error) {
+      throw error;
+    } finally {
+      if (shouldFinishTransaction) {
+        this._isInTransaction = false;
+      }
     }
     return res;
   }
@@ -493,6 +508,19 @@ export function openOrCreate(
   }
 ): SQLiteDatabase {
   const obj = new SQLiteDatabase(getRealPath(filePath), options);
+  obj.open();
+  return obj;
+}
+
+export function wrapDb(
+  db: FMDatabase,
+  options?: {
+    readOnly?: boolean;
+    transformBlobs?: boolean;
+    threading?: boolean;
+  }
+): SQLiteDatabase {
+  const obj = new SQLiteDatabase(db, options);
   obj.open();
   return obj;
 }

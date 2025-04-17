@@ -25,5 +25,11 @@ import { HeroComponent } from '../shared/hero.component';
 })
 export class NativescriptSQLiteRxstorageComponent {
   adapter = 'SQLite RxStorage Adapter';
-  constructor(public _rxdb: RxDBCoreService) {}
+  constructor(public _rxdb: RxDBCoreService) {
+    setTimeout(() => {
+      this._rxdb.heros$.subscribe((heroes) => {
+        console.log('Heroes:', heroes);
+      });
+    }, 5000);
+  }
 }
