@@ -28,6 +28,7 @@ function getCheckpoint(data: any[], lastCheckpoint) {
 @Injectable()
 export class RxDBCoreService implements OnDestroy {
   heros$;
+  heros: Signal<RxDocument<RxHeroDocumentType>[]>;
   replicationState;
   database: RxDatabase;
   private destroy$ = new Subject<void>();
@@ -132,6 +133,11 @@ export class RxDBCoreService implements OnDestroy {
       selector: {},
       sort: [{ name: 'asc' }],
     }).$;
+
+    this.heros = this.database.heroes.find({
+      selector: {},
+      sort: [{ name: 'asc' }],
+    }).$$ as any;
   }
 
   addHero() {
