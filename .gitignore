@@ -47,3 +47,4 @@ Thumbs.db
 packages/**/angular/dist
 
 .nx/cache
+.nx/workspace-data

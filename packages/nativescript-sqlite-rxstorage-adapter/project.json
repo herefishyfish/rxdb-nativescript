@@ -4,7 +4,7 @@
   "sourceRoot": "packages/nativescript-sqlite-rxstorage-adapter",
   "targets": {
     "build": {
-      "executor": "@nrwl/js:tsc",
+      "executor": "@nx/js:tsc",
       "options": {
         "outputPath": "dist/packages/nativescript-sqlite-rxstorage-adapter",
         "tsConfig": "packages/nativescript-sqlite-rxstorage-adapter/tsconfig.json",
@@ -20,16 +20,11 @@
             "output": "./platforms/"
           }
         ],
-        "dependsOn": [
-          {
-            "target": "build.all",
-            "projects": "dependencies"
-          }
-        ]
+        "dependsOn": ["^build"]
       }
     },
     "build.all": {
-      "executor": "@nrwl/workspace:run-commands",
+      "executor": "@nx/workspace:run-commands",
       "options": {
         "commands": ["node tools/scripts/build-finish.ts nativescript-sqlite-rxstorage-adapter"],
         "parallel": false
@@ -47,14 +42,14 @@
       ]
     },
     "focus": {
-      "executor": "@nrwl/workspace:run-commands",
+      "executor": "@nx/workspace:run-commands",
       "options": {
         "commands": ["nx g @nativescript/plugin-tools:focus-packages nativescript-sqlite-rxstorage-adapter"],
         "parallel": false
       }
     },
     "lint": {
-      "executor": "@nrwl/linter:eslint",
+      "executor": "@nx/linter:eslint",
       "options": {
         "lintFilePatterns": ["packages/nativescript-sqlite-rxstorage-adapter/**/*.ts"]
       }

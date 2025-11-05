@@ -5,11 +5,7 @@
     "@valor/nativescript-websockets": "file:../../node_modules/@valor/nativescript-websockets",
     "@herefishyfish/nativescript-rxdb": "file:../../dist/packages/nativescript-rxdb",
     "@herefishyfish/nativescript-sqlite-rxstorage-adapter": "file:../../dist/packages/nativescript-sqlite-rxstorage-adapter",
-    "@herefishyfish/nativescript-lokijs": "file:../../dist/packages/nativescript-lokijs",
     "@herefishyfish/requery-sqlite": "file:../../dist/packages/requery-sqlite"
-  },
-  "__docs": {
-    "@herefishyfish/requery-sqlite": "3.4.2"
   },
   "devDependencies": {
     "@nativescript/android": "~8.9.0",

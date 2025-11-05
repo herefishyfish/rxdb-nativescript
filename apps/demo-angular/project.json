@@ -1,4 +1,6 @@
 {
+  "name": "demo-angular",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/demo-angular/src",
   "projectType": "application",
   "prefix": "demo",
@@ -15,31 +17,33 @@
       "dependsOn": [
         {
           "target": "build.all",
-          "projects": "dependencies"
+          "dependencies": true
         }
       ]
     },
     "ios": {
       "executor": "@nativescript/nx:build",
       "options": {
-        "platform": "ios"
+        "platform": "ios",
+        "noHmr": true
       },
       "dependsOn": [
         {
           "target": "build.all",
-          "projects": "dependencies"
+          "dependencies": true
         }
       ]
     },
     "android": {
       "executor": "@nativescript/nx:build",
       "options": {
-        "platform": "android"
+        "platform": "android",
+        "noHmr": true
       },
       "dependsOn": [
         {
           "target": "build.all",
-          "projects": "dependencies"
+          "dependencies": true
         }
       ]
     },
@@ -50,10 +54,7 @@
       }
     },
     "lint": {
-      "executor": "@nrwl/linter:eslint",
-      "options": {
-        "lintFilePatterns": ["apps/demo-angular/**/*.ts"]
-      }
+      "executor": "@nx/eslint:lint"
     }
   }
 }

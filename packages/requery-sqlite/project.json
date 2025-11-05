@@ -4,7 +4,7 @@
   "sourceRoot": "packages/requery-sqlite",
   "targets": {
     "build": {
-      "executor": "@nrwl/js:tsc",
+      "executor": "@nx/js:tsc",
       "options": {
         "outputPath": "dist/packages/requery-sqlite",
         "tsConfig": "packages/requery-sqlite/tsconfig.json",
@@ -29,7 +29,7 @@
       }
     },
     "build.all": {
-      "executor": "@nrwl/workspace:run-commands",
+      "executor": "@nx/workspace:run-commands",
       "options": {
         "commands": ["node tools/scripts/build-finish.ts requery-sqlite"],
         "parallel": false
@@ -47,14 +47,14 @@
       ]
     },
     "focus": {
-      "executor": "@nrwl/workspace:run-commands",
+      "executor": "@nx/workspace:run-commands",
       "options": {
         "commands": ["nx g @nativescript/plugin-tools:focus-packages requery-sqlite"],
         "parallel": false
       }
     },
     "lint": {
-      "executor": "@nrwl/linter:eslint",
+      "executor": "@nx/linter:eslint",
       "options": {
         "lintFilePatterns": ["packages/requery-sqlite/**/*.ts"]
       }

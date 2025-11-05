@@ -16,6 +16,11 @@
   },
   "private": true,
   "devDependencies": {
+    "@nano-sql/core": "^2.3.7",
+    "@nativescript-community/typeorm": "^0.2.29",
+    "nativescript-permissions": "1.3.11",
+    "nativescript-vue": "~2.9.0",
+    "nativescript-vue-template-compiler": "~2.9.0",
     "@angular-devkit/build-angular": "^19.0.0",
     "@angular/animations": "^19.0.0",
     "@angular/common": "^19.0.0",
@@ -26,38 +31,35 @@
     "@angular/platform-browser": "^19.0.0",
     "@angular/platform-browser-dynamic": "^19.0.0",
     "@angular/router": "^19.0.0",
-    "@nano-sql/core": "^2.3.7",
-    "@nativescript-community/typeorm": "^0.2.29",
     "@nativescript/angular": "^19.0.0",
     "@nativescript/core": "~8.9.0",
-    "@nativescript/plugin-tools": "4.0.1",
+    "@nativescript/plugin-tools": "5.5.3",
     "@nativescript/types": "~8.9.0",
-    "@nativescript/webpack": "~5.0.24",
+    "@nativescript/webpack": "~5.0.22",
     "@ngtools/webpack": "^19.0.0",
-    "husky": "^8.0.0",
-    "nativescript-permissions": "1.3.11",
-    "nativescript-vue": "~2.9.0",
-    "nativescript-vue-template-compiler": "~2.9.0",
+    "@valor/nativescript-websockets": "^2.0.2",
+    "patch-package": "^6.4.7",
+    "rxdb": "16.20.0",
+    "rxdb-premium": "16.20.0",
+    "husky": "~9.0.0",
     "ng-packagr": "^19.0.0",
-    "nx": "15.8.6",
     "rxjs": "~7.8.0",
+    "sass": "1.53.0",
     "typescript": "~5.6.0",
-    "zone.js": "~0.15.0"
+    "zone.js": "~0.15.0",
+    "@nativescript-community/sqlite": "3.5.1",
+    "@nativescript-use/nativescript-localstorage": "^0.0.1",
+    "app-root-path": "^3.1.0",
+    "graphql-ws": "^6.0.4",
+    "lokijs": "^1.5.12"
   },
   "lint-staged": {
     "**/*.{js,ts,scss,json,html}": [
       "npx prettier --write"
     ]
   },
-  "dependencies": {
-    "@nativescript-community/sqlite": "^3.4.1",
-    "@valor/nativescript-websockets": "^2.0.2",
-    "app-root-path": "^3.1.0",
-    "graphql-ws": "^6.0.4",
-    "lokijs": "^1.5.12",
-    "object-path": "^0.11.8",
-    "patch-package": "^6.4.7",
-    "rxdb": "16.11.0",
-    "rxdb-premium": "16.11.0"
+  "nativescript-nx": {
+    "prefix": "",
+    "framework": "angular"
   }
 }
