@@ -1,7 +1,6 @@
-type SQLiteQueryWithParams = any;
 import { knownFolders, path } from '@nativescript/core';
 import { openOrCreate, SQLiteDatabase } from '@herefishyfish/requery-sqlite';
-import { SQLiteBasics } from 'rxdb-premium/plugins/storage-sqlite';
+import { SQLiteBasics, SQLResultRow, SQLiteQueryWithParams } from 'rxdb-premium/plugins/storage-sqlite';
 
 export interface ISQLiteDatabaseAdapterOptions {
   transformBlobs?: boolean;
@@ -20,13 +19,13 @@ export const getSQLiteBasicsNativeScript = (options?: ISQLiteDatabaseAdapterOpti
         ...(options ?? {}),
       });
     },
-    all: async (db: SQLiteDatabase, queryWithParams: SQLiteQueryWithParams) => {
-      return (await db.select(queryWithParams.query, queryWithParams.params ?? [])) as any;
+    all: async (db: SQLiteDatabase, queryWithParams: SQLiteQueryWithParams): Promise<SQLResultRow[]> => {
+      return db.select(queryWithParams.query, queryWithParams.params ?? []);
     },
     run: async (db: SQLiteDatabase, queryWithParams: SQLiteQueryWithParams) => {
-      await db.select(queryWithParams.query, queryWithParams.params ?? []);
+      return db.select(queryWithParams.query, queryWithParams.params ?? []);
     },
-    close: (db: SQLiteDatabase) => {
+    close: async (db: SQLiteDatabase) => {
       return db.close();
     },
     journalMode: '',

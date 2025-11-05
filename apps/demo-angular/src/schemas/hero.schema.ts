@@ -30,7 +30,7 @@ export const HERO_SCHEMA_LITERAL = {
     //   type: 'boolean',
     // }
   },
-  required: ['id', 'name'],
+  required: ['id', 'name', 'color'],
 } as const;
 
 const schemaTyped = toTypedRxJsonSchema(HERO_SCHEMA_LITERAL);

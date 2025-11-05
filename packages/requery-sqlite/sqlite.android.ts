@@ -37,6 +37,19 @@ export class SQLiteDatabase extends SQLiteDatabaseBase {
   }
 }
 
+export function wrapDb(
+  db: io.requery.android.database.sqlite.SQLiteDatabase,
+  options?: {
+    readOnly?: boolean;
+    transformBlobs?: boolean;
+    threading?: boolean;
+  }
+): SQLiteDatabase {
+  const obj = new SQLiteDatabase(db, options);
+  obj.open();
+  return obj;
+}
+
 export const openOrCreate = (
   filePath: string,
   options?: {

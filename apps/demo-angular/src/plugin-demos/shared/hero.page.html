@@ -5,7 +5,9 @@
       <button text="Add Hero" (tap)="_rxdb.addHero()" class="btn btn-primary"></button>
       <button text="Test Heros" (tap)="_rxdb.test()" class="btn btn-primary"></button>
 
-      <app-hero *ngFor="let hero of _rxdb.heros$ | async" [hero]="hero"></app-hero>
+      @if (_rxdb.heros?.()) { @for (hero of _rxdb.heros(); track hero.id) {
+      <app-hero [hero]="hero"></app-hero>
+      } }
     </StackLayout>
   </ScrollView>
 </StackLayout>

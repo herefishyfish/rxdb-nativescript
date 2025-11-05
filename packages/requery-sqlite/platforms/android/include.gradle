@@ -5,6 +5,6 @@
 	}
 
 dependencies {
-  implementation 'com.github.requery:sqlite-android:3.39.2'
+  implementation 'com.github.requery:sqlite-android:3.45.0'
   implementation 'androidx.sqlite:sqlite:2.1.0'
 }

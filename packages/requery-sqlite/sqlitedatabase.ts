@@ -1,6 +1,6 @@
 import { SqliteParam, SqliteParams, SqliteRow, paramsToStringArray, throwError } from './sqlite.common';
 
-type Db = any;
+type Db = io.requery.android.database.sqlite.SQLiteDatabase;
 
 type FromCursor<T> = (cursor: android.database.Cursor, transformBlobs?: boolean) => T;
 
@@ -75,6 +75,10 @@ const arrayFromCursor = (cursor: android.database.Cursor, transformBlobs?: boole
         data.push(transformBlobs ? byteArrayToBuffer(cursor.getBlob(i)) : cursor.getBlob(i));
         break;
 
+      case android.database.Cursor.FIELD_TYPE_NULL:
+        data.push(null);
+        break;
+
       default:
         throwError(`unknown.type: ${type}`);
     }
@@ -142,13 +146,15 @@ const transactionRaw = async <T = any>(db: Db, action: (cancel?: () => void) => 
   }
 };
 
-const messagePromises: { [key: string]: { resolve; reject; timeoutTimer: NodeJS.Timer }[] } = {};
+const messagePromises: { [key: string]: { resolve: Function; reject: Function; timeoutTimer: ReturnType<typeof setTimeout> }[] } = {};
+
 export class SQLiteDatabaseBase {
+  filePath: string;
   db: io.requery.android.database.sqlite.SQLiteDatabase;
   flags;
   transformBlobs: boolean;
   constructor(
-    public filePath: string,
+    filePathOrDb: string | io.requery.android.database.sqlite.SQLiteDatabase,
     options?: {
       threading?: boolean;
       readOnly?: boolean;
@@ -156,6 +162,12 @@ export class SQLiteDatabaseBase {
       transformBlobs?: boolean;
     }
   ) {
+    if (filePathOrDb instanceof io.requery.android.database.sqlite.SQLiteDatabase) {
+      this.db = filePathOrDb;
+      this.filePath = filePathOrDb.getPath();
+    } else {
+      this.filePath = filePathOrDb;
+    }
     this.threading = options && options.threading === true;
     this.flags = options?.flags;
     this.transformBlobs = !options || options.transformBlobs !== false;
@@ -187,15 +199,7 @@ export class SQLiteDatabaseBase {
     }
   }
   lastId: number;
-  sendMessageToWorker(
-    nativeData,
-    messageData,
-    timeout = 0
-  ): Promise<{
-    id: number;
-    nativeDatas?: { [k: string]: any };
-    [k: string]: any;
-  }> {
+  sendMessageToWorker(nativeData, messageData, timeout = 0): Promise<any> {
     return new Promise((resolve, reject) => {
       let id = Date.now().valueOf();
       if (id <= this.lastId) {
@@ -238,7 +242,7 @@ export class SQLiteDatabaseBase {
     return this.db && this.db.isOpen();
   }
 
-  async close() {
+  close() {
     if (!this.isOpen) return;
     if (this.worker) {
       this.worker.postMessage({
@@ -253,7 +257,7 @@ export class SQLiteDatabaseBase {
   async setVersion(version: number) {
     this.db.setVersion(version);
   }
-  async getVersion() {
+  getVersion() {
     return this.db.getVersion();
   }
   async execute(query: string, params?: SqliteParams) {

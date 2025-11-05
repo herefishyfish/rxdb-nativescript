@@ -14,11 +14,13 @@ The core plugin provides the compatibility layer for RxDB to work with NativeScr
 
 NativeScript RxDB Plugins also provide adapters for different databases to work with NativeScript, including:
 
-- [@herefishyfish/nativescript-lokijs-adapter](packages/nativescript-lokijs/README.md)
-- [@herefishyfish/nativescript-md5](packages/nativescript-md5/README.md)
-- [@herefishyfish/nativescript-pouchdb-sqlite-adapter](packages/nativescript-pouchdb-sqlite-adapter/README.md)
 - [@herefishyfish/nativescript-sqlite-rxstorage-adapter](packages/nativescript-sqlite-rxstorage-adapter/README.md)
+- [@herefishyfish/nativescript-lokijs-adapter](packages/nativescript-lokijs/README.md)
+
+#### SQLite Database
+
 - [@herefishyfish/requery-sqlite](packages/requery-sqlite/README.md)
+RxDB requires the JSON1 extension to be enabled for SQLite. This isn't available in the default Android SQLite implementation. This package provides a SQLite implementation that includes the JSON1 extension.
 
 ### How to use NativeScript RxDB Plugins?
 

@@ -21,7 +21,6 @@
     "noEmitOnError": false,
     "noImplicitAny": false,
     "noImplicitReturns": true,
-    "noImplicitUseStrict": true,
     "noFallthroughCasesInSwitch": true
   },
   "exclude": ["**/*.spec.ts", "**/*.test.ts", "angular", "platforms", "scripts"],

@@ -4,14 +4,11 @@
     "@nativescript/core": "file:../../node_modules/@nativescript/core",
     "@valor/nativescript-websockets": "file:../../node_modules/@valor/nativescript-websockets",
     "@herefishyfish/nativescript-rxdb": "file:../../dist/packages/nativescript-rxdb",
-    "@herefishyfish/nativescript-md5": "file:../../dist/packages/nativescript-md5",
     "@herefishyfish/nativescript-sqlite-rxstorage-adapter": "file:../../dist/packages/nativescript-sqlite-rxstorage-adapter",
-    "@herefishyfish/nativescript-pouchdb-sqlite-adapter": "file:../../dist/packages/nativescript-pouchdb-sqlite-adapter",
-    "@herefishyfish/nativescript-lokijs": "file:../../dist/packages/nativescript-lokijs",
     "@herefishyfish/requery-sqlite": "file:../../dist/packages/requery-sqlite"
   },
   "devDependencies": {
-    "@nativescript/android": "beta",
-    "@nativescript/ios": "~8.4.0"
+    "@nativescript/android": "~8.9.0",
+    "@nativescript/ios": "~8.9.0"
   }
 }
