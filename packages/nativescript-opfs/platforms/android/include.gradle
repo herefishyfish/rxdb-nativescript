@@ -1,0 +1,7 @@
+android {
+}
+
+dependencies {
+	// No external dependencies are required for the OPFS plugin.
+	// All functionality is built on top of standard Java I/O (java.io / java.nio.channels).
+}

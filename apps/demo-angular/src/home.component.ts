@@ -13,6 +13,9 @@ export class HomeComponent {
       name: 'rxstorage-memory',
     },
     {
+      name: 'rxstorage-opfs',
+    },
+    {
       name: 'localstorage-rxstorage',
     },
     {

@@ -8,11 +8,15 @@
     "build": {
       "executor": "@nativescript/nx:build",
       "options": {
-        "noHmr": true,
-        "production": true,
-        "uglify": true,
-        "release": true,
-        "forDevice": true
+        "noHmr": true
+      },
+      "configurations": {
+        "release": {
+          "production": true,
+          "uglify": true,
+          "release": true,
+          "forDevice": true
+        }
       },
       "dependsOn": [
         {
@@ -25,7 +29,11 @@
       "executor": "@nativescript/nx:build",
       "options": {
         "platform": "ios",
-        "noHmr": true
+        "noHmr": true,
+        "release": false,
+        "forDevice": false,
+        "production": false,
+        "uglify": false
       },
       "dependsOn": [
         {
@@ -35,10 +43,11 @@
       ]
     },
     "android": {
-      "executor": "@nativescript/nx:build",
+      "executor": "nx:run-commands",
       "options": {
-        "platform": "android",
-        "noHmr": true
+        "commands": ["ns run android --no-hmr --force"],
+        "parallel": false,
+        "cwd": "apps/demo-angular"
       },
       "dependsOn": [
         {

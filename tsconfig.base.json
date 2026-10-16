@@ -3,7 +3,7 @@
     "rootDir": ".",
     "sourceMap": true,
     "declaration": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "noEmitHelpers": false,
@@ -13,7 +13,8 @@
     "lib": ["ESNext", "dom"],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
-    "baseUrl": ".",
+    "strict": false,
+    "types": ["node"],
     "plugins": [
       {
         "transform": "@nativescript/webpack/dist/transformers/NativeClass",
@@ -21,12 +22,12 @@
       }
     ],
     "paths": {
-      "@demo/shared": ["tools/demo/index.ts"],
-      "@herefishyfish/*": ["packages/*"],
-      "@herefishyfish/nativescript-lokijs": ["packages/nativescript-lokijs/index.d.ts"],
-      "@herefishyfish/nativescript-rxdb": ["packages/nativescript-rxdb/index.d.ts"],
-      "@herefishyfish/nativescript-sqlite-rxstorage-adapter": ["packages/nativescript-sqlite-rxstorage-adapter/index.d.ts"],
-      "@herefishyfish/requery-sqlite": ["packages/requery-sqlite/index.d.ts"]
+      "@demo/shared": ["./tools/demo/index.ts"],
+      "@herefishyfish/*": ["./packages/*"],
+      "@herefishyfish/nativescript-lokijs": ["./packages/nativescript-lokijs/index.d.ts"],
+      "@herefishyfish/nativescript-rxdb": ["./packages/nativescript-rxdb/index.ts"],
+      "@herefishyfish/nativescript-sqlite-rxstorage-adapter": ["./packages/nativescript-sqlite-rxstorage-adapter/index.ts"],
+      "@herefishyfish/nativescript-opfs": ["./packages/nativescript-opfs/index.d.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

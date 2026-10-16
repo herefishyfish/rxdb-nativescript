@@ -9,11 +9,10 @@
     "@herefishyfish/rxdb": "file:../../packages/rxdb",
     "@herefishyfish/nativescript-sqlite-rxstorage-adapter": "file:../../packages/nativescript-sqlite-rxstorage-adapter",
     "@herefishyfish/nativescript-pouchdb-sqlite-adapter": "file:../../packages/nativescript-pouchdb-sqlite-adapter",
-    "@herefishyfish/nativescript-lokijs": "file:../../packages/nativescript-lokijs",
-    "@herefishyfish/requery-sqlite": "file:../../packages/requery-sqlite"
+    "@herefishyfish/nativescript-lokijs": "file:../../packages/nativescript-lokijs"
   },
   "devDependencies": {
-    "@nativescript/android": "~8.2.0",
-    "@nativescript/ios": "~8.2.0"
+    "@nativescript/android": "~9.1.0",
+    "@nativescript/ios": "~9.1.0"
   }
 }

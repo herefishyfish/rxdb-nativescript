@@ -1,7 +1,7 @@
 {
   "name": "@herefishyfish/nativescript-sqlite-rxstorage-adapter",
-  "version": "1.0.3",
-  "description": "Add a plugin description",
+  "version": "2.0.0",
+  "description": "RxDB SQLite storage adapter for NativeScript",
   "main": "index",
   "typings": "index.d.ts",
   "nativescript": {
@@ -26,7 +26,7 @@
     "email": "dylan@herefishy.dev"
   },
   "dependencies": {
-    "@herefishyfish/requery-sqlite": "*"
+    "@edusperoni/nativescript-sqlite": "0.0.7"
   },
   "bugs": {
     "url": "https://github.com/herefishyfish/rxdb-nativescript/issues"

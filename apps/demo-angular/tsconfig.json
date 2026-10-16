@@ -2,8 +2,8 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "paths": {
-      "~/*": ["src/*"],
-      "@demo/shared": ["tools/demo/index.ts"],
+      "~/*": ["./src/*"],
+      "@demo/shared": ["../../tools/demo/index.ts"],
       "@herefishyfish/*": ["../../dist/packages/*"]
     }
   },

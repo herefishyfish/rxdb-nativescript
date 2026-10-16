@@ -1,14 +1,15 @@
 {
   "main": "./src/main.ts",
   "dependencies": {
-    "@nativescript/core": "file:../../node_modules/@nativescript/core",
-    "@valor/nativescript-websockets": "file:../../node_modules/@valor/nativescript-websockets",
+    "@edusperoni/nativescript-sqlite": "file:../../node_modules/@edusperoni/nativescript-sqlite",
+    "@herefishyfish/nativescript-opfs": "file:../../dist/packages/nativescript-opfs",
     "@herefishyfish/nativescript-rxdb": "file:../../dist/packages/nativescript-rxdb",
     "@herefishyfish/nativescript-sqlite-rxstorage-adapter": "file:../../dist/packages/nativescript-sqlite-rxstorage-adapter",
-    "@herefishyfish/requery-sqlite": "file:../../dist/packages/requery-sqlite"
+    "@nativescript/core": "file:../../node_modules/@nativescript/core",
+    "@valor/nativescript-websockets": "file:../../node_modules/@valor/nativescript-websockets"
   },
   "devDependencies": {
-    "@nativescript/android": "~8.9.0",
-    "@nativescript/ios": "~8.9.0"
+    "@nativescript/android": "9.1.1",
+    "@nativescript/ios": "~9.1.0"
   }
 }
