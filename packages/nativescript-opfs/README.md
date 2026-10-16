@@ -37,11 +37,13 @@ import org.nativescript.plugins.opfs.OPFS;
 import org.nativescript.plugins.opfs.FileSystemDirectoryHandle;
 import org.nativescript.plugins.opfs.FileSystemFileHandle;
 import org.nativescript.plugins.opfs.FileSystemSyncAccessHandle;
+import java.nio.ByteBuffer;
 
 FileSystemDirectoryHandle root = OPFS.getDirectory(context);
 FileSystemFileHandle handle = root.getFileHandle("hello.txt", true);
 FileSystemSyncAccessHandle h = handle.createSyncAccessHandle();
-h.write("Hello OPFS".getBytes(), 0);
+ByteBuffer bytes = ByteBuffer.wrap("Hello OPFS".getBytes());
+h.write(bytes, 0, bytes.remaining(), 0);
 h.flush();
 h.close();
 ```
@@ -67,4 +69,5 @@ const storage = getRxStorageOPFSMainThread();
 
 - `FileSystemSyncAccessHandle` methods are **synchronous** by spec; when using them from JS for high-throughput workloads (e.g. RxDB OPFS storage), invoke from a worker thread to keep the UI responsive.
 - Only one sync access handle may be open per file at a time (a second one rejects with `NoModificationAllowedError`).
+- `createWritable()` returns a stream with `write`/`seek`/`truncate`/`close` (raw data or `WriteParams`), not a full `WritableStream`. Writes go straight to the file rather than to a swap file committed on `close()`.
 - Errors use spec names (`NotFoundError`, `TypeMismatchError`, `InvalidModificationError`, ...) on both platforms.

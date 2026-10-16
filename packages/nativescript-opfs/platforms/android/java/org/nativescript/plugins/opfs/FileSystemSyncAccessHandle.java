@@ -49,21 +49,17 @@ public final class FileSystemSyncAccessHandle {
     }
 
     /**
-     * Reads up to {@code buffer.length} bytes from {@code at} into {@code buffer}.
+     * Reads up to {@code length} bytes from {@code at} into {@code buffer} starting at {@code offset}.
+     * The buffer can be a JS ArrayBuffer, which NativeScript passes as a direct ByteBuffer.
      *
      * @return number of bytes read, or 0 at EOF (matches the web spec).
      */
-    public int read(byte[] buffer, long at) throws IOException {
-        ensureOpen();
-        return read(buffer, 0, buffer.length, at);
-    }
-
-    public int read(byte[] buffer, int offset, int length, long at) throws IOException {
+    public int read(ByteBuffer buffer, int offset, int length, long at) throws IOException {
         ensureOpen();
         if (at < 0) {
             throw new IllegalArgumentException("at must be >= 0");
         }
-        ByteBuffer bb = ByteBuffer.wrap(buffer, offset, length);
+        ByteBuffer bb = slice(buffer, offset, length);
         int total = 0;
         while (bb.hasRemaining()) {
             int n = channel.read(bb, at + total);
@@ -74,19 +70,15 @@ public final class FileSystemSyncAccessHandle {
     }
 
     /**
-     * Writes {@code buffer} at offset {@code at}.
+     * Writes {@code length} bytes of {@code buffer}, starting at {@code offset}, to the file at {@code at}.
      * @return number of bytes written.
      */
-    public int write(byte[] buffer, long at) throws IOException {
-        return write(buffer, 0, buffer.length, at);
-    }
-
-    public int write(byte[] buffer, int offset, int length, long at) throws IOException {
+    public int write(ByteBuffer buffer, int offset, int length, long at) throws IOException {
         ensureOpen();
         if (at < 0) {
             throw new IllegalArgumentException("at must be >= 0");
         }
-        ByteBuffer bb = ByteBuffer.wrap(buffer, offset, length);
+        ByteBuffer bb = slice(buffer, offset, length);
         int total = 0;
         while (bb.hasRemaining()) {
             total += channel.write(bb, at + total);
@@ -102,7 +94,6 @@ public final class FileSystemSyncAccessHandle {
         if (newSize < channel.size()) {
             channel.truncate(newSize);
         } else {
-            // Extend the file by writing a single zero byte at newSize - 1.
             raf.setLength(newSize);
         }
     }
@@ -129,6 +120,13 @@ public final class FileSystemSyncAccessHandle {
                 OPEN_FILES.remove(canonicalPath);
             }
         }
+    }
+
+    static ByteBuffer slice(ByteBuffer buffer, int offset, int length) {
+        ByteBuffer bb = buffer.duplicate();
+        bb.limit(offset + length);
+        bb.position(offset);
+        return bb;
     }
 
     private void ensureOpen() {

@@ -8,4 +8,4 @@
 export * from './common';
 
 export declare function installOPFSPolyfill(): void;
-export declare function getOPFSRoot(): Promise<import('./common').FileSystemDirectoryHandle>;
+export declare function getOPFSRoot(): Promise<import('./common').OPFSDirectoryHandle>;

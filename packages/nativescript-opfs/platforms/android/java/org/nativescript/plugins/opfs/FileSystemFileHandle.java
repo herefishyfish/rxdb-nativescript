@@ -1,7 +1,10 @@
 package org.nativescript.plugins.opfs;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 
 /**
  * Mirrors the web {@code FileSystemFileHandle}.
@@ -26,6 +29,18 @@ public final class FileSystemFileHandle extends FileSystemHandle {
 
     public long getSize() {
         return file.length();
+    }
+
+    /** Reads the whole file into a direct buffer, which JS can wrap with {@code ArrayBuffer.from}. */
+    public ByteBuffer readAll() throws IOException {
+        try (FileChannel channel = new FileInputStream(file).getChannel()) {
+            ByteBuffer bb = ByteBuffer.allocateDirect((int) channel.size());
+            while (bb.hasRemaining() && channel.read(bb) >= 0) {
+                // keep reading until full or EOF
+            }
+            bb.flip();
+            return bb;
+        }
     }
 
     public String getAbsolutePath() {

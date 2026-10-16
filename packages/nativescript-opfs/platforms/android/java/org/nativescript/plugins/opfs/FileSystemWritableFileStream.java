@@ -33,13 +33,9 @@ public final class FileSystemWritableFileStream {
         return new FileSystemWritableFileStream(raf, 0L);
     }
 
-    public int write(byte[] data) throws IOException {
-        return write(data, 0, data.length);
-    }
-
-    public int write(byte[] data, int offset, int length) throws IOException {
+    public int write(ByteBuffer data, int offset, int length) throws IOException {
         ensureOpen();
-        ByteBuffer bb = ByteBuffer.wrap(data, offset, length);
+        ByteBuffer bb = FileSystemSyncAccessHandle.slice(data, offset, length);
         int total = 0;
         while (bb.hasRemaining()) {
             int n = channel.write(bb, position + total);

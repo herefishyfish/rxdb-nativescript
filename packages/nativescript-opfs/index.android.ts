@@ -1,11 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Application, Utils } from '@nativescript/core';
-import { domError, installPolyfillOnNavigator, type FileSystemDirectoryHandle, type FileSystemFileHandle, type FileSystemReadWriteOptions, type FileSystemSyncAccessHandle, type FileSystemWritableFileStream } from './common';
+import { domError, installPolyfillOnNavigator, toUint8Array, WritableFileStreamBase, type FileSystemReadWriteOptions, type FileSystemSyncAccessHandle, type OPFSDirectoryHandle, type OPFSFileHandle, type OPFSWritableFileStream } from './common';
 
 export * from './common';
 
 declare const org: any;
-declare const java: any;
 
 // ---------------------------------------------------------------------------
 // Native-binding helpers
@@ -42,37 +41,13 @@ function native<T>(fn: () => T): T {
 }
 
 // ---------------------------------------------------------------------------
-// Buffer <-> Java byte[] conversion
+// Buffers: the runtime passes a JS ArrayBuffer to Java as a direct ByteBuffer
+// over the same memory, so no per-byte copies cross the bridge.
 // ---------------------------------------------------------------------------
 
-function toByteArray(buffer: ArrayBuffer | ArrayBufferView): { bytes: any; length: number } {
-  let view: Uint8Array;
-  if (buffer instanceof ArrayBuffer) {
-    view = new Uint8Array(buffer);
-  } else if (ArrayBuffer.isView(buffer)) {
-    view = new Uint8Array(buffer.buffer, buffer.byteOffset, buffer.byteLength);
-  } else {
-    throw new TypeError('Expected ArrayBuffer or ArrayBufferView');
-  }
-  const bytes = (Array as any).create('byte', view.length);
-  for (let i = 0; i < view.length; i++) {
-    const v = view[i];
-    bytes[i] = v < 128 ? v : v - 256;
-  }
-  return { bytes, length: view.length };
-}
-
-function readIntoBuffer(buffer: ArrayBuffer | ArrayBufferView, bytes: any, n: number): void {
-  let view: Uint8Array;
-  if (buffer instanceof ArrayBuffer) {
-    view = new Uint8Array(buffer);
-  } else {
-    view = new Uint8Array(buffer.buffer, buffer.byteOffset, buffer.byteLength);
-  }
-  for (let i = 0; i < n; i++) {
-    const v = bytes[i];
-    view[i] = v < 0 ? v + 256 : v;
-  }
+function nativeBuffer(view: Uint8Array): any {
+  const buffer: any = view.buffer;
+  return buffer.nativeObject ?? buffer;
 }
 
 // ---------------------------------------------------------------------------
@@ -82,23 +57,18 @@ function readIntoBuffer(buffer: ArrayBuffer | ArrayBufferView, bytes: any, n: nu
 class SyncAccessHandleImpl implements FileSystemSyncAccessHandle {
   constructor(private native: any) {}
 
-  read(buffer: ArrayBuffer | ArrayBufferView, options?: FileSystemReadWriteOptions): number {
-    const at = options && typeof options.at === 'number' ? options.at : 0;
-    const len = (buffer as any).byteLength;
-    const tmp = (Array as any).create('byte', len);
-    const n = this.native.read(tmp, java.lang.Long.valueOf(at).longValue());
-    readIntoBuffer(buffer, tmp, n);
-    return n;
+  read(buffer: BufferSource, options?: FileSystemReadWriteOptions): number {
+    const view = toUint8Array(buffer);
+    return this.native.read(nativeBuffer(view), view.byteOffset, view.byteLength, options?.at ?? 0);
   }
 
-  write(buffer: ArrayBuffer | ArrayBufferView, options?: FileSystemReadWriteOptions): number {
-    const at = options && typeof options.at === 'number' ? options.at : 0;
-    const { bytes } = toByteArray(buffer);
-    return this.native.write(bytes, java.lang.Long.valueOf(at).longValue());
+  write(buffer: BufferSource, options?: FileSystemReadWriteOptions): number {
+    const view = toUint8Array(buffer);
+    return this.native.write(nativeBuffer(view), view.byteOffset, view.byteLength, options?.at ?? 0);
   }
 
   truncate(newSize: number): void {
-    this.native.truncate(java.lang.Long.valueOf(newSize).longValue());
+    this.native.truncate(newSize);
   }
 
   getSize(): number {
@@ -114,31 +84,21 @@ class SyncAccessHandleImpl implements FileSystemSyncAccessHandle {
   }
 }
 
-class WritableFileStreamImpl implements FileSystemWritableFileStream {
-  constructor(private native: any) {}
+class WritableFileStreamImpl extends WritableFileStreamBase {
+  constructor(private native: any) {
+    super();
+  }
 
-  async write(data: ArrayBuffer | ArrayBufferView | Blob | string): Promise<void> {
-    let view: Uint8Array;
-    if (typeof data === 'string') {
-      view = new TextEncoder().encode(data);
-    } else if (typeof Blob !== 'undefined' && data instanceof Blob) {
-      const ab = await (data as Blob).arrayBuffer();
-      view = new Uint8Array(ab);
-    } else if (data instanceof ArrayBuffer) {
-      view = new Uint8Array(data);
-    } else {
-      view = new Uint8Array((data as ArrayBufferView).buffer, (data as ArrayBufferView).byteOffset, (data as ArrayBufferView).byteLength);
-    }
-    const { bytes } = toByteArray(view);
-    this.native.write(bytes);
+  protected writeBytes(bytes: Uint8Array): void {
+    this.native.write(nativeBuffer(bytes), bytes.byteOffset, bytes.byteLength);
   }
 
   async seek(position: number): Promise<void> {
-    this.native.seek(java.lang.Long.valueOf(position).longValue());
+    this.native.seek(position);
   }
 
   async truncate(size: number): Promise<void> {
-    this.native.truncate(java.lang.Long.valueOf(size).longValue());
+    this.native.truncate(size);
   }
 
   async close(): Promise<void> {
@@ -146,7 +106,7 @@ class WritableFileStreamImpl implements FileSystemWritableFileStream {
   }
 }
 
-class FileHandleImpl implements FileSystemFileHandle {
+class FileHandleImpl implements OPFSFileHandle {
   readonly kind = 'file' as const;
   constructor(
     public readonly native: any,
@@ -162,27 +122,11 @@ class FileHandleImpl implements FileSystemFileHandle {
   }
 
   async getFile(): Promise<File> {
-    const path = this.native.getAbsolutePath();
-    const javaFile = new java.io.File(path);
-    const len = javaFile.length();
-    const fis = new java.io.FileInputStream(javaFile);
-    try {
-      const bytes = (Array as any).create('byte', len);
-      let read = 0;
-      while (read < len) {
-        const n = fis.read(bytes, read, len - read);
-        if (n < 0) break;
-        read += n;
-      }
-      const ab = new ArrayBuffer(len);
-      readIntoBuffer(ab, bytes, len);
-      return new File([ab], this.name);
-    } finally {
-      fis.close();
-    }
+    // ArrayBuffer.from wraps the direct ByteBuffer without copying.
+    return new File([(ArrayBuffer as any).from(this.native.readAll())], this.name);
   }
 
-  async createWritable(options?: { keepExistingData?: boolean }): Promise<FileSystemWritableFileStream> {
+  async createWritable(options?: { keepExistingData?: boolean }): Promise<OPFSWritableFileStream> {
     const keep = !!(options && options.keepExistingData);
     return new WritableFileStreamImpl(this.native.createWritable(keep));
   }
@@ -197,7 +141,7 @@ class FileHandleImpl implements FileSystemFileHandle {
   }
 }
 
-class DirectoryHandleImpl implements FileSystemDirectoryHandle {
+class DirectoryHandleImpl implements OPFSDirectoryHandle {
   readonly kind = 'directory' as const;
   constructor(
     public readonly native: any,
@@ -212,7 +156,7 @@ class DirectoryHandleImpl implements FileSystemDirectoryHandle {
     return this.native.getAbsolutePath();
   }
 
-  async getFileHandle(name: string, options?: { create?: boolean }): Promise<FileSystemFileHandle> {
+  async getFileHandle(name: string, options?: { create?: boolean }): Promise<OPFSFileHandle> {
     const create = !!(options && options.create);
     return new FileHandleImpl(
       native(() => this.native.getFileHandle(name, create)),
@@ -220,7 +164,7 @@ class DirectoryHandleImpl implements FileSystemDirectoryHandle {
     );
   }
 
-  async getDirectoryHandle(name: string, options?: { create?: boolean }): Promise<FileSystemDirectoryHandle> {
+  async getDirectoryHandle(name: string, options?: { create?: boolean }): Promise<OPFSDirectoryHandle> {
     const create = !!(options && options.create);
     return new DirectoryHandleImpl(
       native(() => this.native.getDirectoryHandle(name, create)),
@@ -247,11 +191,11 @@ class DirectoryHandleImpl implements FileSystemDirectoryHandle {
     for await (const [k] of this.entries()) yield k;
   }
 
-  async *values(): AsyncIterableIterator<FileSystemFileHandle | FileSystemDirectoryHandle> {
+  async *values(): AsyncIterableIterator<OPFSFileHandle | OPFSDirectoryHandle> {
     for await (const [, v] of this.entries()) yield v;
   }
 
-  async *entries(): AsyncIterableIterator<[string, FileSystemFileHandle | FileSystemDirectoryHandle]> {
+  async *entries(): AsyncIterableIterator<[string, OPFSFileHandle | OPFSDirectoryHandle]> {
     const list = this.native.entries();
     const size = list.size();
     for (let i = 0; i < size; i++) {
@@ -274,7 +218,7 @@ class DirectoryHandleImpl implements FileSystemDirectoryHandle {
 // Public API
 // ---------------------------------------------------------------------------
 
-export async function getOPFSRoot(): Promise<FileSystemDirectoryHandle> {
+export async function getOPFSRoot(): Promise<OPFSDirectoryHandle> {
   const ctx = getAndroidContext();
   const root = getNativeOPFS().getDirectory(ctx);
   return new DirectoryHandleImpl(root, '');

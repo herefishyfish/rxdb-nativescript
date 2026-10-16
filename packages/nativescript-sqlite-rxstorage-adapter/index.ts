@@ -2,7 +2,7 @@ import { knownFolders, path } from '@nativescript/core';
 import { openDatabase, type DatabaseOptions, type SQLiteDatabase } from '@edusperoni/nativescript-sqlite';
 import type { SQLiteBasics, SQLResultRow } from 'rxdb-premium/plugins/storage-sqlite';
 
-export type NativeScriptSQLiteOptions = Partial<Omit<DatabaseOptions, 'path'>> & {
+export type NativeScriptSQLiteOptions = Partial<Omit<DatabaseOptions, 'path' | 'serialized'>> & {
   /** Directory for database files. Defaults to `<documents>/db`. */
   directory?: string;
 };
@@ -12,9 +12,9 @@ export const getSQLiteBasicsNativeScript = (options: NativeScriptSQLiteOptions =
   return {
     open: async (name) => {
       const db = openDatabase({
-        // rxdb runs raw BEGIN/COMMIT and writes through all(), so everything must share one connection.
-        serialized: true,
         ...dbOptions,
+        // rxdb runs raw BEGIN/COMMIT, so every query must share one connection.
+        serialized: true,
         path: name === ':memory:' ? name : path.join(directory ?? knownFolders.documents().getFolder('db').path, `${name}.sqlite`),
       });
       await db.initialized();

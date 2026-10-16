@@ -1,4 +1,4 @@
-import { domError, installPolyfillOnNavigator, type FileSystemDirectoryHandle, type FileSystemFileHandle, type FileSystemReadWriteOptions, type FileSystemSyncAccessHandle, type FileSystemWritableFileStream } from './common';
+import { domError, installPolyfillOnNavigator, toUint8Array, WritableFileStreamBase, type FileSystemReadWriteOptions, type FileSystemSyncAccessHandle, type OPFSDirectoryHandle, type OPFSFileHandle, type OPFSWritableFileStream } from './common';
 
 export * from './common';
 
@@ -22,18 +22,16 @@ function childPath(dir: string, name: string): string {
   return `${dir}/${name}`;
 }
 
-function toNSData(data: ArrayBuffer | ArrayBufferView): NSData {
-  const view = data instanceof ArrayBuffer ? new Uint8Array(data) : new Uint8Array(data.buffer, data.byteOffset, data.byteLength);
+function toNSData(view: Uint8Array): NSData {
   // Marshalling uses the start of the backing buffer, so copy views that don't start at 0.
   const bytes = view.byteOffset === 0 ? view.buffer : view.slice().buffer;
   return NSData.dataWithBytesLength(bytes as any, view.byteLength);
 }
 
-function copyInto(target: ArrayBuffer | ArrayBufferView, data: NSData): number {
+function copyInto(target: BufferSource, data: NSData): number {
   const n = data.length;
   if (n === 0) return 0;
-  const view = target instanceof ArrayBuffer ? new Uint8Array(target) : new Uint8Array(target.buffer, target.byteOffset, target.byteLength);
-  view.set(new Uint8Array(interop.bufferFromData(data)));
+  toUint8Array(target).set(new Uint8Array(interop.bufferFromData(data)));
   return n;
 }
 
@@ -54,15 +52,15 @@ class SyncAccessHandleImpl implements FileSystemSyncAccessHandle {
     if (this.closed) throw domError('InvalidStateError', 'FileSystemSyncAccessHandle is closed.');
   }
 
-  read(buffer: ArrayBuffer | ArrayBufferView, options?: FileSystemReadWriteOptions): number {
+  read(buffer: BufferSource, options?: FileSystemReadWriteOptions): number {
     this.ensureOpen();
     this.handle.seekToFileOffset(options?.at ?? 0);
-    return copyInto(buffer, this.handle.readDataOfLength((buffer as any).byteLength));
+    return copyInto(buffer, this.handle.readDataOfLength(buffer.byteLength));
   }
 
-  write(buffer: ArrayBuffer | ArrayBufferView, options?: FileSystemReadWriteOptions): number {
+  write(buffer: BufferSource, options?: FileSystemReadWriteOptions): number {
     this.ensureOpen();
-    const data = toNSData(buffer);
+    const data = toNSData(toUint8Array(buffer));
     this.handle.seekToFileOffset(options?.at ?? 0);
     this.handle.writeData(data);
     return data.length;
@@ -94,21 +92,19 @@ class SyncAccessHandleImpl implements FileSystemSyncAccessHandle {
   }
 }
 
-class WritableFileStreamImpl implements FileSystemWritableFileStream {
+class WritableFileStreamImpl extends WritableFileStreamBase {
   private position = 0;
   private closed = false;
-  constructor(private handle: NSFileHandle) {}
+  constructor(private handle: NSFileHandle) {
+    super();
+  }
 
   private ensureOpen() {
     if (this.closed) throw domError('InvalidStateError', 'FileSystemWritableFileStream is closed.');
   }
 
-  async write(data: ArrayBuffer | ArrayBufferView | Blob | string): Promise<void> {
+  protected writeBytes(bytes: Uint8Array): void {
     this.ensureOpen();
-    let bytes: ArrayBuffer | ArrayBufferView;
-    if (typeof data === 'string') bytes = new TextEncoder().encode(data);
-    else if (typeof Blob !== 'undefined' && data instanceof Blob) bytes = await data.arrayBuffer();
-    else bytes = data as ArrayBuffer | ArrayBufferView;
     const ns = toNSData(bytes);
     this.handle.seekToFileOffset(this.position);
     this.handle.writeData(ns);
@@ -134,7 +130,7 @@ class WritableFileStreamImpl implements FileSystemWritableFileStream {
   }
 }
 
-class FileHandleImpl implements FileSystemFileHandle {
+class FileHandleImpl implements OPFSFileHandle {
   readonly kind = 'file' as const;
   constructor(
     public readonly __path: string,
@@ -151,7 +147,7 @@ class FileHandleImpl implements FileSystemFileHandle {
     return new File([data.length ? interop.bufferFromData(data) : new ArrayBuffer(0)], this.name);
   }
 
-  async createWritable(options?: { keepExistingData?: boolean }): Promise<FileSystemWritableFileStream> {
+  async createWritable(options?: { keepExistingData?: boolean }): Promise<OPFSWritableFileStream> {
     const handle = openForUpdate(this.__path);
     if (!options?.keepExistingData) handle.truncateFileAtOffset(0);
     return new WritableFileStreamImpl(handle);
@@ -167,7 +163,7 @@ class FileHandleImpl implements FileSystemFileHandle {
   }
 }
 
-class DirectoryHandleImpl implements FileSystemDirectoryHandle {
+class DirectoryHandleImpl implements OPFSDirectoryHandle {
   readonly kind = 'directory' as const;
   constructor(
     public readonly __path: string,
@@ -178,7 +174,7 @@ class DirectoryHandleImpl implements FileSystemDirectoryHandle {
     return !!other && other.kind === 'directory' && other.__path === this.__path;
   }
 
-  async getFileHandle(name: string, options?: { create?: boolean }): Promise<FileSystemFileHandle> {
+  async getFileHandle(name: string, options?: { create?: boolean }): Promise<OPFSFileHandle> {
     const p = childPath(this.__path, name);
     const kind = kindAt(p);
     if (kind === 'directory') throw domError('TypeMismatchError', `Entry '${name}' exists and is a directory.`);
@@ -189,7 +185,7 @@ class DirectoryHandleImpl implements FileSystemDirectoryHandle {
     return new FileHandleImpl(p, name);
   }
 
-  async getDirectoryHandle(name: string, options?: { create?: boolean }): Promise<FileSystemDirectoryHandle> {
+  async getDirectoryHandle(name: string, options?: { create?: boolean }): Promise<OPFSDirectoryHandle> {
     const p = childPath(this.__path, name);
     const kind = kindAt(p);
     if (kind === 'file') throw domError('TypeMismatchError', `Entry '${name}' exists and is not a directory.`);
@@ -222,11 +218,11 @@ class DirectoryHandleImpl implements FileSystemDirectoryHandle {
     for await (const [k] of this.entries()) yield k;
   }
 
-  async *values(): AsyncIterableIterator<FileSystemFileHandle | FileSystemDirectoryHandle> {
+  async *values(): AsyncIterableIterator<OPFSFileHandle | OPFSDirectoryHandle> {
     for await (const [, v] of this.entries()) yield v;
   }
 
-  async *entries(): AsyncIterableIterator<[string, FileSystemFileHandle | FileSystemDirectoryHandle]> {
+  async *entries(): AsyncIterableIterator<[string, OPFSFileHandle | OPFSDirectoryHandle]> {
     const names = fm().contentsOfDirectoryAtPathError(this.__path);
     if (!names) return;
     for (let i = 0; i < names.count; i++) {
@@ -241,7 +237,7 @@ class DirectoryHandleImpl implements FileSystemDirectoryHandle {
   }
 }
 
-export async function getOPFSRoot(): Promise<FileSystemDirectoryHandle> {
+export async function getOPFSRoot(): Promise<OPFSDirectoryHandle> {
   const base = fm().URLsForDirectoryInDomains(NSSearchPathDirectory.ApplicationSupportDirectory, NSSearchPathDomainMask.UserDomainMask).firstObject.path;
   const root = `${base}/${ROOT_DIR_NAME}`;
   if (kindAt(root) !== 'directory') {

@@ -1,95 +1,43 @@
 /**
- * Shared, platform-agnostic types for @herefishyfish/nativescript-opfs.
+ * Shared, platform-agnostic pieces of @herefishyfish/nativescript-opfs.
  *
- * These mirror the WHATWG File System Access API:
- *   https://fs.spec.whatwg.org/
- *   https://developer.mozilla.org/docs/Web/API/File_System_API
+ * Handle types come from lib.dom (https://fs.spec.whatwg.org/). The polyfill
+ * deviates from it in two places: `FileSystemWritableFileStream` is not a
+ * `WritableStream`, and `createSyncAccessHandle` (worker-only in lib.dom) is
+ * available on every file handle.
  *
- * The actual runtime implementations live in:
- *   - index.android.ts (Android, backed by org.nativescript.plugins.opfs)
- *   - index.ios.ts     (iOS, backed by NSFileManager / NSFileHandle)
- *
- * Web spec consumers (e.g. RxDB OPFS storage) only need the polyfill installed
- * on `globalThis.navigator.storage` via {@link installOPFSPolyfill}.
+ * Runtime implementations live in index.android.ts and index.ios.ts.
  */
-
-export type FileSystemHandleKind = 'file' | 'directory';
-
-export interface FileSystemHandle {
-  readonly kind: FileSystemHandleKind;
-  readonly name: string;
-  isSameEntry(other: FileSystemHandle): Promise<boolean>;
-}
-
-export interface FileSystemGetFileOptions {
-  create?: boolean;
-}
-
-export interface FileSystemGetDirectoryOptions {
-  create?: boolean;
-}
-
-export interface FileSystemRemoveOptions {
-  recursive?: boolean;
-}
-
-export interface FileSystemCreateWritableOptions {
-  keepExistingData?: boolean;
-}
 
 export interface FileSystemReadWriteOptions {
   at?: number;
 }
 
-export interface FileSystemFileHandle extends FileSystemHandle {
-  readonly kind: 'file';
-  getFile(): Promise<File>;
-  createWritable(options?: FileSystemCreateWritableOptions): Promise<FileSystemWritableFileStream>;
-  createSyncAccessHandle(): Promise<FileSystemSyncAccessHandle>;
-}
-
-export interface FileSystemDirectoryHandle extends FileSystemHandle {
-  readonly kind: 'directory';
-  getFileHandle(name: string, options?: FileSystemGetFileOptions): Promise<FileSystemFileHandle>;
-  getDirectoryHandle(name: string, options?: FileSystemGetDirectoryOptions): Promise<FileSystemDirectoryHandle>;
-  removeEntry(name: string, options?: FileSystemRemoveOptions): Promise<void>;
-  resolve(possibleDescendant: FileSystemHandle): Promise<string[] | null>;
-  keys(): AsyncIterableIterator<string>;
-  values(): AsyncIterableIterator<FileSystemFileHandle | FileSystemDirectoryHandle>;
-  entries(): AsyncIterableIterator<[string, FileSystemFileHandle | FileSystemDirectoryHandle]>;
-  [Symbol.asyncIterator](): AsyncIterableIterator<[string, FileSystemFileHandle | FileSystemDirectoryHandle]>;
-}
-
-export interface FileSystemWritableFileStream {
-  write(data: ArrayBuffer | ArrayBufferView | Blob | string): Promise<void>;
-  seek(position: number): Promise<void>;
-  truncate(size: number): Promise<void>;
-  close(): Promise<void>;
-}
-
+/** Worker-only on the web, so lib.dom does not declare it. */
 export interface FileSystemSyncAccessHandle {
-  read(buffer: ArrayBuffer | ArrayBufferView, options?: FileSystemReadWriteOptions): number;
-  write(buffer: ArrayBuffer | ArrayBufferView, options?: FileSystemReadWriteOptions): number;
+  read(buffer: BufferSource, options?: FileSystemReadWriteOptions): number;
+  write(buffer: BufferSource, options?: FileSystemReadWriteOptions): number;
   truncate(newSize: number): void;
   getSize(): number;
   flush(): void;
   close(): void;
 }
 
-/**
- * Public installer signature; implemented per-platform.
- *
- * Installs `globalThis.navigator.storage.getDirectory` if not already present.
- * Safe to call multiple times.
- */
-export type InstallOPFSPolyfill = () => void;
+export type OPFSWritableFileStream = Pick<FileSystemWritableFileStream, 'write' | 'seek' | 'truncate' | 'close'>;
 
-/**
- * Public root accessor; implemented per-platform.
- *
- * Returns the OPFS root directory handle without touching globals.
- */
-export type GetOPFSRoot = () => Promise<FileSystemDirectoryHandle>;
+export interface OPFSFileHandle extends Omit<FileSystemFileHandle, 'createWritable'> {
+  createWritable(options?: FileSystemCreateWritableOptions): Promise<OPFSWritableFileStream>;
+  createSyncAccessHandle(): Promise<FileSystemSyncAccessHandle>;
+}
+
+export interface OPFSDirectoryHandle extends Omit<FileSystemDirectoryHandle, 'getFileHandle' | 'getDirectoryHandle' | 'keys' | 'values' | 'entries' | typeof Symbol.asyncIterator> {
+  getFileHandle(name: string, options?: FileSystemGetFileOptions): Promise<OPFSFileHandle>;
+  getDirectoryHandle(name: string, options?: FileSystemGetDirectoryOptions): Promise<OPFSDirectoryHandle>;
+  keys(): AsyncIterableIterator<string>;
+  values(): AsyncIterableIterator<OPFSFileHandle | OPFSDirectoryHandle>;
+  entries(): AsyncIterableIterator<[string, OPFSFileHandle | OPFSDirectoryHandle]>;
+  [Symbol.asyncIterator](): AsyncIterableIterator<[string, OPFSFileHandle | OPFSDirectoryHandle]>;
+}
 
 /** Creates a spec-named error (e.g. 'NotFoundError'); NativeScript has no global DOMException. */
 export function domError(name: string, message: string): Error {
@@ -100,11 +48,61 @@ export function domError(name: string, message: string): Error {
   return err;
 }
 
+export function toUint8Array(data: BufferSource): Uint8Array {
+  if (ArrayBuffer.isView(data)) return new Uint8Array(data.buffer, data.byteOffset, data.byteLength);
+  if (data instanceof ArrayBuffer) return new Uint8Array(data);
+  throw new TypeError('Expected an ArrayBuffer or ArrayBufferView.');
+}
+
+async function chunkBytes(data: BufferSource | Blob | string): Promise<Uint8Array> {
+  if (typeof data === 'string') return new TextEncoder().encode(data);
+  if (typeof Blob !== 'undefined' && data instanceof Blob) return new Uint8Array(await data.arrayBuffer());
+  return toUint8Array(data as BufferSource);
+}
+
+function isWriteParams(chunk: FileSystemWriteChunkType): chunk is WriteParams {
+  return typeof chunk === 'object' && chunk !== null && !ArrayBuffer.isView(chunk) && !(chunk instanceof ArrayBuffer) && !(typeof Blob !== 'undefined' && chunk instanceof Blob);
+}
+
+/**
+ * Implements `write()` for both platforms: raw data, or the `WriteParams` form
+ * (`{ type: 'write' | 'seek' | 'truncate', ... }`) that RxDB uses.
+ */
+export abstract class WritableFileStreamBase implements OPFSWritableFileStream {
+  /** Writes at the cursor and advances it. */
+  protected abstract writeBytes(bytes: Uint8Array): void;
+  abstract seek(position: number): Promise<void>;
+  abstract truncate(size: number): Promise<void>;
+  abstract close(): Promise<void>;
+
+  async write(chunk: FileSystemWriteChunkType): Promise<void> {
+    if (!isWriteParams(chunk)) {
+      this.writeBytes(await chunkBytes(chunk));
+      return;
+    }
+    switch (chunk.type) {
+      case 'write':
+        if (chunk.data == null) throw domError('SyntaxError', "write() with type 'write' requires data.");
+        if (chunk.position != null) await this.seek(chunk.position);
+        this.writeBytes(await chunkBytes(chunk.data));
+        return;
+      case 'seek':
+        if (chunk.position == null) throw domError('SyntaxError', "write() with type 'seek' requires position.");
+        return this.seek(chunk.position);
+      case 'truncate':
+        if (chunk.size == null) throw domError('SyntaxError', "write() with type 'truncate' requires size.");
+        return this.truncate(chunk.size);
+      default:
+        throw new TypeError(`Unknown write type: ${(chunk as { type: unknown }).type}`);
+    }
+  }
+}
+
 /**
  * Helper used by platform implementations to install onto `navigator.storage`
  * without overwriting an existing native implementation.
  */
-export function installPolyfillOnNavigator(getRoot: GetOPFSRoot): void {
+export function installPolyfillOnNavigator(getRoot: () => Promise<OPFSDirectoryHandle>): void {
   const g: any = globalThis as any;
   if (!g.navigator) g.navigator = {};
   if (!g.navigator.storage) g.navigator.storage = {};
