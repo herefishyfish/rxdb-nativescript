@@ -3,6 +3,8 @@
   "version": "2.0.0",
   "description": "RxDB SQLite storage adapter for NativeScript",
   "main": "index",
+  "module": "index",
+  "types": "index.d.ts",
   "typings": "index.d.ts",
   "nativescript": {
     "platforms": {

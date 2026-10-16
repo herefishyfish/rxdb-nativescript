@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "description": "Web-spec compliant Origin Private File System (OPFS) polyfill for NativeScript (Android and iOS).",
   "main": "index",
+  "module": "index",
+  "types": "index.d.ts",
   "typings": "index.d.ts",
   "nativescript": {
     "platforms": {

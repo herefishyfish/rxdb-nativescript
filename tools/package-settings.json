@@ -12,5 +12,6 @@
     "url": "https://github.com/herefishyfish/rxdb-nativescript/issues"
   },
   "license": "Apache-2.0",
-  "homepage": "https://github.com/herefishyfish/rxdb-nativescript"
+  "homepage": "https://github.com/herefishyfish/rxdb-nativescript",
+  "name": "@herefishyfish"
 }
