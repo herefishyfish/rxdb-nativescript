@@ -1,0 +1,39 @@
+{
+  "name": "@herefishyfish/nativescript-opfs",
+  "version": "1.0.0",
+  "description": "Web-spec compliant Origin Private File System (OPFS) polyfill for NativeScript (Android and iOS).",
+  "main": "index",
+  "module": "index",
+  "types": "index.d.ts",
+  "typings": "index.d.ts",
+  "nativescript": {
+    "platforms": {
+      "ios": "6.0.0",
+      "android": "6.0.0"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/herefishyfish/rxdb-nativescript.git"
+  },
+  "keywords": [
+    "NativeScript",
+    "OPFS",
+    "Origin Private File System",
+    "File System Access",
+    "Polyfill",
+    "Android",
+    "iOS"
+  ],
+  "author": {
+    "name": "Dylan Llewellyn",
+    "email": "dylan@herefishy.dev"
+  },
+  "bugs": {
+    "url": "https://github.com/herefishyfish/rxdb-nativescript/issues"
+  },
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/herefishyfish/rxdb-nativescript",
+  "readmeFilename": "README.md",
+  "bootstrapper": "@nativescript/plugin-seed"
+}

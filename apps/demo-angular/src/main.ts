@@ -1,6 +1,6 @@
 import { runNativeScriptAngularApp, platformNativeScript, bootstrapApplication, provideNativeScriptHttpClient, provideNativeScriptNgZone, provideNativeScriptRouter } from '@nativescript/angular';
 import { withInterceptorsFromDi } from '@angular/common/http';
-import { provideExperimentalZonelessChangeDetection } from '@angular/core';
+import { provideZonelessChangeDetection } from '@angular/core';
 import { AppComponent } from './app.component';
 import { routes } from './app-routing.module';
 
@@ -14,7 +14,7 @@ runNativeScriptAngularApp({
       providers: [
         provideNativeScriptHttpClient(withInterceptorsFromDi()),
         provideNativeScriptRouter(routes),
-        provideExperimentalZonelessChangeDetection(),
+        provideZonelessChangeDetection(),
         // provideNativeScriptNgZone(),
       ],
     });

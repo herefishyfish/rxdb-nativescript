@@ -1,33 +1,30 @@
 import { knownFolders, path } from '@nativescript/core';
-import { openOrCreate, SQLiteDatabase } from '@herefishyfish/requery-sqlite';
-import { SQLiteBasics, SQLResultRow, SQLiteQueryWithParams } from 'rxdb-premium/plugins/storage-sqlite';
+import { openDatabase, type DatabaseOptions, type SQLiteDatabase } from '@edusperoni/nativescript-sqlite';
+import type { SQLiteBasics, SQLResultRow } from 'rxdb-premium/plugins/storage-sqlite';
 
-export interface ISQLiteDatabaseAdapterOptions {
-  transformBlobs?: boolean;
-  threading?: boolean;
-  flags?: number;
-}
+export type NativeScriptSQLiteOptions = Partial<Omit<DatabaseOptions, 'path' | 'serialized'>> & {
+  /** Directory for database files. Defaults to `<documents>/db`. */
+  directory?: string;
+};
 
-export const getSQLiteBasicsNativeScript = (options?: ISQLiteDatabaseAdapterOptions): SQLiteBasics<SQLiteDatabase> => {
+export const getSQLiteBasicsNativeScript = (options: NativeScriptSQLiteOptions = {}): SQLiteBasics<SQLiteDatabase> => {
+  const { directory, ...dbOptions } = options;
   return {
-    setPragma: async (db, key, value) => {
-      return db.execute(`PRAGMA ${key} = ${value}`) as any;
-    },
-    open: async (name: string) => {
-      return await openOrCreate(path.join(knownFolders.documents().getFolder('db').path, `${name}.sqlite`), {
-        transformBlobs: true,
-        ...(options ?? {}),
+    open: async (name) => {
+      const db = openDatabase({
+        ...dbOptions,
+        // rxdb runs raw BEGIN/COMMIT, so every query must share one connection.
+        serialized: true,
+        path: name === ':memory:' ? name : path.join(directory ?? knownFolders.documents().getFolder('db').path, `${name}.sqlite`),
       });
+      await db.initialized();
+      return db;
     },
-    all: async (db: SQLiteDatabase, queryWithParams: SQLiteQueryWithParams): Promise<SQLResultRow[]> => {
-      return db.select(queryWithParams.query, queryWithParams.params ?? []);
-    },
-    run: async (db: SQLiteDatabase, queryWithParams: SQLiteQueryWithParams) => {
-      return db.select(queryWithParams.query, queryWithParams.params ?? []);
-    },
-    close: async (db: SQLiteDatabase) => {
-      return db.close();
-    },
+    all: (db, q) => db.select(q.query, q.params) as Promise<SQLResultRow[]>,
+    run: (db, q) => db.execute(q.query, q.params),
+    setPragma: (db, key, value) => db.execute(`PRAGMA ${key} = ${value}`),
+    close: (db) => db.close(),
+    // The plugin already enables WAL on open.
     journalMode: '',
   };
 };

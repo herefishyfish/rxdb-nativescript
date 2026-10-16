@@ -1,0 +1,43 @@
+diff --git a/node_modules/@edusperoni/nativescript-sqlite/platforms/android/include.gradle b/node_modules/@edusperoni/nativescript-sqlite/platforms/android/include.gradle
+index c821947..0d404bf 100644
+--- a/node_modules/@edusperoni/nativescript-sqlite/platforms/android/include.gradle
++++ b/node_modules/@edusperoni/nativescript-sqlite/platforms/android/include.gradle
+@@ -285,17 +285,17 @@ def cmakeArgs = [
+ ]
+ 
+ if (sqliteProjectDir != null) {
+-    cmakeArgs << "-DNSCSQLITE_SQLITE_PROJECT_DIR=${sqliteProjectDir.absolutePath}"
++    cmakeArgs << "-DNSCSQLITE_SQLITE_PROJECT_DIR=${sqliteProjectDir.absolutePath.replace('\\', '/')}"
+ } else {
+-    cmakeArgs << "-DNSCSQLITE_SQLITE_SOURCE_DIR=${sqliteSourceDir.absolutePath}"
++    cmakeArgs << "-DNSCSQLITE_SQLITE_SOURCE_DIR=${sqliteSourceDir.absolutePath.replace('\\', '/')}"
+ }
+ 
+ if (v8IncludeDir) {
+-    cmakeArgs << "-DV8_INCLUDE_DIR=${v8IncludeDir.absolutePath}"
++    cmakeArgs << "-DV8_INCLUDE_DIR=${v8IncludeDir.absolutePath.replace('\\', '/')}"
+ }
+ 
+ if (nsStubsDir) {
+-    cmakeArgs << "-DNS_LIBS_DIR=${nsStubsDir}"
++    cmakeArgs << "-DNS_LIBS_DIR=${nsStubsDir.replace('\\', '/')}"
+ }
+ 
+ android {
+diff --git a/node_modules/@edusperoni/nativescript-sqlite/platforms/android/native/CMakeLists.txt b/node_modules/@edusperoni/nativescript-sqlite/platforms/android/native/CMakeLists.txt
+index 895879e..01a1572 100644
+--- a/node_modules/@edusperoni/nativescript-sqlite/platforms/android/native/CMakeLists.txt
++++ b/node_modules/@edusperoni/nativescript-sqlite/platforms/android/native/CMakeLists.txt
+@@ -180,10 +180,8 @@ else()
+     set(_ns_stub_dir "${PROJECT_SOURCE_DIR}/libs/${ANDROID_ABI}")
+ endif()
+ 
+-add_library(NativeScript SHARED IMPORTED)
+-set_target_properties(NativeScript PROPERTIES
+-    IMPORTED_LOCATION ${_ns_stub_dir}/libNativeScript.so
+-)
++# Plain -L/-l (not an IMPORTED target) so AGP doesn't package the stub over the app's real runtime.
++target_link_directories(nscsqlite PRIVATE ${_ns_stub_dir})
+ 
+ # Post-build strip
+ add_custom_command(TARGET nscsqlite POST_BUILD COMMAND ${CMAKE_STRIP} --strip-unneeded $<TARGET_FILE:nscsqlite>)

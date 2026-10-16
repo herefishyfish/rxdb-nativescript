@@ -4,9 +4,10 @@
     "rootDirs": [".", "../.."],
     "baseUrl": ".",
     "paths": {
-      "~/*": ["src/*"],
+      "~/*": ["./src/*"],
       "@demo/shared": ["../../tools/demo/index.ts"],
-      "@rxdb/*": ["../../packages/*"]
+      "@rxdb/*": ["../../packages/*"],
+      "@herefishyfish/*": ["../../packages/*"]
     }
   }
 }

@@ -1,14 +1,22 @@
-const { resolve } = require('path');
-const appRoot = require('app-root-path');
+import { createRequire } from 'module';
+import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
 
-module.exports = (webpack) => {
+const require = createRequire(import.meta.url);
+const here = dirname(fileURLToPath(import.meta.url));
+
+function hook(webpack) {
   webpack.chainWebpack((config) => {
-    const nodeModulesPath = webpack.Utils.project.getProjectFilePath('node_modules');
+    const projectRoot = webpack.Utils.project.getProjectRootPath();
+    const pkgDir = (name, from) => dirname(require.resolve(`${name}/package.json`, { paths: [from] }));
+    const rxdbDir = pkgDir('rxdb', projectRoot);
 
-    // Fix and patch imports
-    config.resolve.alias.set('isomorphic-ws', resolve(appRoot.path, './node_modules/isomorphic-ws/browser.js'));
-    config.resolve.alias.set('isomorphic-fetch', resolve(nodeModulesPath, '@nativescript/core'));
-    config.resolve.alias.set('broadcast-channel', resolve(appRoot.path, './node_modules/broadcast-channel/dist/esbrowser'));
-    config.resolve.alias.set(resolve(appRoot.path, './node_modules/unload/dist/es/browser.js'), resolve(nodeModulesPath, '@herefishyfish/nativescript-rxdb/unload/browser.js'));
+    // NativeScript builds with target "node", so these would otherwise resolve to their Node builds.
+    config.resolve.alias.set('broadcast-channel$', join(pkgDir('broadcast-channel', rxdbDir), 'dist/esbrowser/index.js'));
+    config.resolve.alias.set('ws$', join(here, 'ws.js'));
+    config.resolve.alias.set('unload$', join(here, 'unload.js'));
   });
-};
+}
+
+// @nativescript/webpack loads hooks with require(); this makes require(esm) return the function.
+export { hook as 'module.exports' };

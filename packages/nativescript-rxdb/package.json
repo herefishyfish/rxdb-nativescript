@@ -1,7 +1,9 @@
 {
   "name": "@herefishyfish/nativescript-rxdb",
-  "version": "1.0.5",
+  "version": "2.0.0",
   "description": "RxDB compatibility layer for NativeScript",
+  "main": "index",
+  "typings": "index.d.ts",
   "nativescript": {
     "platforms": {
       "ios": "8.0.0",
@@ -21,9 +23,10 @@
     "RxDB"
   ],
   "dependencies": {
-    "app-root-path": "3.1.0",
-    "nativescript-md5": "1.0.1",
-    "@valor/nativescript-websockets": "^1.0.4"
+    "@valor/nativescript-websockets": "^2.0.2"
+  },
+  "peerDependencies": {
+    "rxdb": ">=17.0.0"
   },
   "devDependencies": {
     "@nativescript/webpack": "*"

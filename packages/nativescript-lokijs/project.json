@@ -20,12 +20,12 @@
       }
     },
     "build.all": {
-      "executor": "@nx/workspace:run-commands",
+      "executor": "nx:run-commands",
       "options": {
         "commands": ["node tools/scripts/build-finish.ts nativescript-lokijs"],
         "parallel": false
       },
-      "outputs": ["dist/packages/nativescript-lokijs"],
+      "outputs": ["{workspaceRoot}/dist/packages/nativescript-lokijs"],
       "dependsOn": [
         {
           "target": "build.all",
@@ -38,7 +38,7 @@
       ]
     },
     "focus": {
-      "executor": "@nx/workspace:run-commands",
+      "executor": "nx:run-commands",
       "options": {
         "commands": ["nx g @nativescript/plugin-tools:focus-packages nativescript-lokijs"],
         "parallel": false

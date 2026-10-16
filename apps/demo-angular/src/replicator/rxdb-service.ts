@@ -1,7 +1,6 @@
-import { Inject, Injectable, InjectionToken, Injector, OnDestroy, Signal, untracked } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { Inject, Injectable, InjectionToken, Injector, signal, type OnDestroy } from '@angular/core';
 import { Dialogs, isAndroid, isIOS } from '@nativescript/core';
-import { addRxPlugin, createRxDatabase, lastOfArray, RxDatabase, RxDocument, RxReactivityFactory } from 'rxdb';
+import { addRxPlugin, createRxDatabase, lastOfArray, RxDatabase, RxDocument } from 'rxdb';
 import { distinctUntilChanged, Observable, Subject, takeUntil } from 'rxjs';
 import { replicateGraphQL } from 'rxdb/plugins/replication-graphql';
 import { RxDBQueryBuilderPlugin } from 'rxdb/plugins/query-builder';
@@ -12,7 +11,7 @@ import { RxDBDevModePlugin } from 'rxdb/plugins/dev-mode';
 const batchSize = 100;
 
 export interface RxDBStorage {
-  getRxDBStorage();
+  getRxDBStorage?(): any;
 }
 
 export const RXDB_STORAGE = new InjectionToken<RxDBStorage>('RXDB_STORAGE');
@@ -28,12 +27,31 @@ function getCheckpoint(data: any[], lastCheckpoint) {
 @Injectable()
 export class RxDBCoreService implements OnDestroy {
   heros$;
-  heros: Signal<RxDocument<RxHeroDocumentType>[]>;
+  heros = signal<RxDocument<RxHeroDocumentType>[]>([]);
   replicationState;
   database: RxDatabase;
   private destroy$ = new Subject<void>();
 
-  constructor(@Inject(RXDB_STORAGE) private rxdbStorage: RxDBStorage, private injector: Injector) {
+  private resolveStorage(): any {
+    const injected: any = this.rxdbStorage as any;
+    if (injected && typeof injected.getRxDBStorage === 'function') {
+      return injected.getRxDBStorage();
+    }
+    return injected;
+  }
+
+  private resolveDbName(storage: any): string {
+    const rawName = storage?.name ?? storage?.statics?.name ?? storage?.constructor?.name ?? 'default';
+    const suffix = String(rawName)
+      .toLowerCase()
+      .replace(/[^a-z0-9_-]/g, '_');
+    return `exampledb_${suffix}`;
+  }
+
+  constructor(
+    @Inject(RXDB_STORAGE) private rxdbStorage: RxDBStorage,
+    private injector: Injector,
+  ) {
     addRxPlugin(RxDBQueryBuilderPlugin);
     addRxPlugin(RxDBDevModePlugin);
 
@@ -45,30 +63,19 @@ export class RxDBCoreService implements OnDestroy {
   }
 
   async initDb(injector: Injector) {
-    const reactivityFactory: RxReactivityFactory<Signal<any>> = {
-      fromObservable(obs, initialValue: any) {
-        return untracked(() =>
-          toSignal(obs, {
-            initialValue,
-            injector,
-            rejectErrors: true,
-          })
-        );
-      },
-    };
-
     const { wrappedValidateAjvStorage } = await import('rxdb/plugins/validate-ajv');
+    const resolvedStorage = this.resolveStorage();
     const storage = wrappedValidateAjvStorage({
-      storage: this.rxdbStorage as any,
+      storage: resolvedStorage,
     });
+    const dbName = this.resolveDbName(resolvedStorage);
 
     console.log('Creating Database');
     this.database = await createRxDatabase({
-      name: 'exampledb',
+      name: dbName,
       storage: storage,
       multiInstance: false,
       ignoreDuplicate: true,
-      reactivity: reactivityFactory,
     });
 
     console.log('Creating Collections');
@@ -126,18 +133,17 @@ export class RxDBCoreService implements OnDestroy {
     });
 
     this.replicationState.error$.pipe(takeUntil(this.destroy$), distinctUntilChanged()).subscribe((err) => {
-      console.dir(err);
+      const cause = err?.parameters?.errors?.[0]?.message ?? err?.parameters?.errors?.message ?? err?.message;
+      console.warn(`Replication ${err?.code ?? 'error'}: ${cause} (retrying)`);
     });
+    this.replicationState.received$.pipe(takeUntil(this.destroy$)).subscribe((doc) => console.log('Replication received', doc.id));
 
     this.heros$ = this.database.heroes.find({
       selector: {},
       sort: [{ name: 'asc' }],
     }).$;
 
-    this.heros = this.database.heroes.find({
-      selector: {},
-      sort: [{ name: 'asc' }],
-    }).$$ as any;
+    this.heros$.pipe(takeUntil(this.destroy$)).subscribe((docs) => this.heros.set(docs));
   }
 
   addHero() {
@@ -207,6 +213,6 @@ export class RxDBCoreService implements OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
-    this.database.remove();
+    this.database?.close();
   }
 }

@@ -3,7 +3,8 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@rxdb/*": ["../../packages/*"]
+      "@rxdb/*": ["../../packages/*"],
+      "@herefishyfish/*": ["../../packages/*"]
     }
   }
 }

@@ -103,11 +103,11 @@ module.exports = {
           description: '@herefishyfish/nativescript-lokijs: Build',
         },
       },
-      // @herefishyfish/requery-sqlite
-      'requery-sqlite': {
+      // @herefishyfish/nativescript-opfs
+      'nativescript-opfs': {
         build: {
-          script: 'nx run requery-sqlite:build.all',
-          description: '@herefishyfish/requery-sqlite: Build',
+          script: 'nx run nativescript-opfs:build.all',
+          description: '@herefishyfish/nativescript-opfs: Build',
         },
       },
       'build-all': {
@@ -144,9 +144,9 @@ module.exports = {
         script: 'nx run nativescript-lokijs:focus',
         description: 'Focus on @herefishyfish/nativescript-lokijs',
       },
-      'requery-sqlite': {
-        script: 'nx run requery-sqlite:focus',
-        description: 'Focus on @herefishyfish/requery-sqlite',
+      'nativescript-opfs': {
+        script: 'nx run nativescript-opfs:focus',
+        description: 'Focus on @herefishyfish/nativescript-opfs',
       },
       reset: {
         script: 'nx g @rxdb/plugin-tools:focus-packages',
